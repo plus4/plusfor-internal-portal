@@ -1,0 +1,128 @@
+# Cursor Project Rules
+
+## Project Structure
+```yaml
+project_root:
+  app:
+    api: "APIエンドポイント"
+    components:
+      ui: "基本UIコンポーネント"
+      layout: "レイアウト関連コンポーネント"
+    hooks: "カスタムフック"
+    lib:
+      api:
+        client.ts: "変更禁止: AIモデル設定"
+        types.ts: "変更禁止: 型定義"
+        config.ts: "変更禁止: 環境設定"
+      utils: "共通関数"
+  components: "共有コンポーネント"
+  lib: "共有ユーティリティ"
+  public: "静的ファイル"
+  src: "ソースコード"
+```
+
+## Technology Stack
+```yaml
+core:
+  typescript: "^5.0.0"
+  nodejs: "^20.0.0"
+
+frontend:
+  nextjs: "^15.1.3"
+  react: "^19.0.0"
+  tailwindcss: "^3.4.17"
+  shadcn_ui: "^2.1.8"
+  indexeddb: "^1.0.0"
+
+dev_tools:
+  npm: "^10.0.0"
+  eslint: "^9.0.0"
+  typescript: "^5.0.0"
+```
+
+## Implementation Rules
+```yaml
+api_management:
+  client_location: "app/lib/api/client.ts"
+  restricted_files:
+    - name: "client.ts"
+      purpose: "AIモデルとAPI設定の中核"
+      change_policy: "承認必須"
+    - name: "types.ts"
+      purpose: "型定義の一元管理"
+      change_policy: "承認必須"
+    - name: "config.ts"
+      purpose: "環境設定の一元管理"
+      change_policy: "承認必須"
+
+implementation_rules:
+  - "AIモデルのバージョンは client.ts でのみ定義"
+  - "型定義は必ず types.ts を参照"
+  - "環境変数の利用は config.ts 経由のみ許可"
+
+placement_rules:
+  ui_components: "components/ui/"
+  api_endpoints: "app/api/[endpoint]/route.ts"
+  common_utils: "lib/utils/"
+  api_related: "app/lib/api/"
+```
+
+## Development Process
+```yaml
+task_analysis:
+  required_steps:
+    - "主要なタスクの要約"
+    - "技術スタックの確認と制約内での実装方法の検討"
+    - "重要な要件と制約の特定"
+    - "潜在的な課題のリストアップ"
+    - "タスク実行ステップの詳細な列挙"
+    - "最適な実行順序の決定"
+
+duplicate_prevention:
+  checks:
+    - "既存の類似機能の有無"
+    - "同名または類似名の関数やコンポーネント"
+    - "重複するAPIエンドポイント"
+    - "共通化可能な処理の特定"
+
+quality_control:
+  verification_process:
+    - "問題の切り分けと原因特定"
+    - "対策案の作成と実施"
+    - "修正後の動作検証"
+    - "デバッグログの確認と分析"
+```
+
+## Important Notes
+```yaml
+restrictions:
+  - "不明点がある場合は作業開始前に確認"
+  - "重要な判断は都度報告し承認を得る"
+  - "予期せぬ問題は即座に報告"
+  - "明示的な指示がない変更は禁止"
+  - "UI/UXデザインの変更は事前承認必須"
+  - "技術スタックのバージョン変更は事前承認必須"
+```
+
+## Requirements Documentation
+```yaml
+documentation:
+  requirements_file: "REQUIREMENTS.md"
+  content:
+    - "プロジェクト概要"
+    - "技術スタック詳細"
+    - "データベース設計"
+    - "機能要件"
+    - "UI/UX要件"
+    - "ページ構成"
+  
+  update_policy:
+    - "要件の変更は必ずREQUIREMENTS.mdに反映"
+    - "変更履歴の管理"
+    - "チームメンバーへの変更通知"
+  
+  reference_rules:
+    - "新機能実装時は必ずREQUIREMENTS.mdを参照"
+    - "要件との整合性確認を実施"
+    - "要件外の機能追加は事前承認必須"
+``` 

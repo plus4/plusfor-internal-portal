@@ -6,7 +6,8 @@
 - https://github.com/vercel/next.js/blob/canary/examples/with-supabase/README.md
 
 ## 認証・DBアクセスできるようになるまで		
-- Supabaseの認証設定へ認証後のリダイレクトURLを指定	
+- Supabaseの認証設定へ認証後のリダイレクトURLを指定
+  - https://supabase.com/dashboard/project/myxtnmomsegbqdvbpqgk?method=github
 - Supabaseでのテーブル作成・データ投入	
 - Next.jsの環境変数へSupabaseとの接続設定を記載（ローカル環境用、商用環境は自動設定）	
 - Next.jsのコードでSupabaseクライアントライブラリを利用してDBアクセス	

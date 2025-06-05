@@ -54,7 +54,7 @@ CREATE POLICY "Allow authenticated users to read employees"
   TO authenticated
   USING (true);
 
--- Insert sample data
+-- Insert sample data for announcements
 INSERT INTO announcements (title, content, is_published) VALUES
   ('システムメンテナンスのお知らせ', '来週月曜日の深夜にシステムメンテナンスを実施します。\n\n実施時間：2024年4月1日 23:00 〜 4月2日 3:00\n\nメンテナンス中はシステムが利用できなくなりますので、ご注意ください。', true),
   ('新入社員研修の開催', '4月1日より新入社員研修を開催します。\n\n日時：2024年4月1日 〜 4月5日\n場所：本社3階 研修室\n\n新入社員の皆様は、指定された時間に集合してください。', true),
@@ -65,21 +65,4 @@ INSERT INTO announcements (title, content, is_published) VALUES
   ('健康診断のご案内', '定期健康診断を実施いたします。\n\n日時：2024年5月20日 〜 5月24日\n場所：本社2階 健康管理室\n\n予約方法などの詳細は、4月中に各部署の担当者からご案内いたします。', false),
   ('社内表彰制度の開始', '新たな社内表彰制度を開始いたします。\n\n表彰対象：\n・優秀な業績を上げた社員\n・イノベーションを起こした社員\n・チームワークに貢献した社員\n\n詳細は人事部までお問い合わせください。', true),
   ('リモートワークガイドラインの更新', 'リモートワークガイドラインを更新いたしました。\n\n主な変更点：\n・在宅勤務の申請方法の簡素化\n・通信費の支給基準の見直し\n・セキュリティガイドラインの追加\n\n詳細は社内ポータルサイトでご確認ください。', true),
-  ('社内勉強会の開催', '技術勉強会を開催いたします。\n\nテーマ：「最新のWeb開発トレンド」\n日時：2024年4月25日 18:00 〜 19:30\n場所：本社4階 会議室A\n\n参加希望の方は、4月20日までに開発部までご連絡ください。', false);
-
-INSERT INTO employees (name, department, position, email) VALUES
-  ('山田 太郎', '開発部', 'シニアエンジニア', 'yamada@example.com'),
-  ('鈴木 花子', '営業部', 'マネージャー', 'suzuki@example.com'),
-  ('佐藤 次郎', '人事部', '部長', 'sato@example.com'),
-  ('田中 美咲', '開発部', 'フロントエンドエンジニア', 'tanaka@example.com'),
-  ('伊藤 健太', '開発部', 'バックエンドエンジニア', 'ito@example.com'),
-  ('渡辺 真理', '営業部', '営業担当', 'watanabe@example.com'),
-  ('高橋 和也', '開発部', 'テックリード', 'takahashi@example.com'),
-  ('小林 恵子', '人事部', '人事担当', 'kobayashi@example.com'),
-  ('加藤 大輔', '開発部', 'インフラエンジニア', 'kato@example.com'),
-  ('吉田 優子', '営業部', '営業担当', 'yoshida@example.com'),
-  ('山本 直樹', '開発部', 'QAエンジニア', 'yamamoto@example.com'),
-  ('中村 美穂', '人事部', '採用担当', 'nakamura@example.com'),
-  ('松本 翔太', '開発部', 'モバイルエンジニア', 'matsumoto@example.com'),
-  ('井上 裕子', '営業部', '営業担当', 'inoue@example.com'),
-  ('木村 健一', '開発部', 'セキュリティエンジニア', 'kimura@example.com'); 
+  ('社内勉強会の開催', '技術勉強会を開催いたします。\n\nテーマ：「最新のWeb開発トレンド」\n日時：2024年4月25日 18:00 〜 19:30\n場所：本社4階 会議室A\n\n参加希望の方は、4月20日までに開発部までご連絡ください。', false); 

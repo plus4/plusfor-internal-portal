@@ -10,7 +10,7 @@ CREATE TABLE announcements (
 
 -- Create employees table
 CREATE TABLE employees (
-  id BIGSERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY REFERENCES auth.users(id),
   name TEXT NOT NULL,
   department TEXT NOT NULL,
   position TEXT NOT NULL,

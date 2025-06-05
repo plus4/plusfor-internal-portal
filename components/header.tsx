@@ -16,15 +16,35 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { useEffect, useState } from "react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 
+type Employee = {
+  name: string;
+  department: string;
+  position: string;
+};
+
 export function Header() {
   const router = useRouter();
   const supabase = createClient();
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [employee, setEmployee] = useState<Employee | null>(null);
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+
+      if (user) {
+        // ユーザーIDを使用して従業員情報を取得
+        const { data: employeeData, error } = await supabase
+          .from('employees')
+          .select('name, department, position')
+          .eq('id', user.id)
+          .single();
+
+        if (!error && employeeData) {
+          setEmployee(employeeData);
+        }
+      }
     };
     getUser();
   }, [supabase.auth]);
@@ -53,7 +73,12 @@ export function Header() {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuItem className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.email}</p>
+                      <p className="text-sm font-medium leading-none">{employee?.name || user.email}</p>
+                      {employee && (
+                        <p className="text-xs text-muted-foreground">
+                          {employee.department} / {employee.position}
+                        </p>
+                      )}
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem>

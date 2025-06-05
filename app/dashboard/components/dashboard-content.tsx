@@ -1,21 +1,7 @@
 'use client';
 
 import Link from "next/link";
-
-type Announcement = {
-  id: number;
-  title: string;
-  content: string;
-  date: string;
-};
-
-type Employee = {
-  id: number;
-  name: string;
-  department: string;
-  position: string;
-  email: string;
-};
+import { Announcement, Employee } from "@/lib/types";
 
 type DashboardContentProps = {
   announcements: Announcement[];
@@ -74,7 +60,9 @@ export function DashboardContent({ announcements, employees }: DashboardContentP
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-semibold">{announcement.title}</h3>
-                    <span className="text-sm text-muted-foreground">{announcement.date}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {new Date(announcement.created_at).toLocaleDateString('ja-JP')}
+                    </span>
                   </div>
                   <p className="text-muted-foreground">{announcement.content}</p>
                 </div>

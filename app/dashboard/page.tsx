@@ -3,12 +3,18 @@ import { getAnnouncements, getEmployees } from "@/lib/api";
 
 export default async function DashboardPage() {
   try {
-    const [announcements, employees] = await Promise.all([
+    const [announcements, employeesResult] = await Promise.all([
       getAnnouncements(),
-      getEmployees(),
+      getEmployees(1, 6),
     ]);
 
-    return <DashboardContent announcements={announcements} employees={employees} />;
+    return (
+      <DashboardContent 
+        announcements={announcements} 
+        employees={employeesResult.data} 
+        hasMoreEmployees={employeesResult.hasMore}
+      />
+    );
   } catch (error) {
     console.error("Error loading dashboard data:", error);
     return (

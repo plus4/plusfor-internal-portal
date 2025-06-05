@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { Announcement, Employee } from "@/lib/types";
+import { EmployeeList } from "./employee-list";
 
 type DashboardContentProps = {
   announcements: Announcement[];
   employees: Employee[];
+  hasMoreEmployees: boolean;
 };
 
-export function DashboardContent({ announcements, employees }: DashboardContentProps) {
+export function DashboardContent({ 
+  announcements, 
+  employees, 
+  hasMoreEmployees 
+}: DashboardContentProps) {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
@@ -81,38 +87,10 @@ export function DashboardContent({ announcements, employees }: DashboardContentP
                 すべて見る
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {employees.map((employee) => (
-                <div
-                  key={employee.id}
-                  className="bg-card rounded-lg border border-border p-6 hover:border-primary/50 transition-colors"
-                >
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-lg font-medium text-primary">
-                          {employee.name.charAt(0)}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">{employee.name}</h3>
-                        <p className="text-sm text-muted-foreground">{employee.position}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center text-sm">
-                        <span className="w-20 text-muted-foreground">部署</span>
-                        <span>{employee.department}</span>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        <span className="w-20 text-muted-foreground">メール</span>
-                        <span className="truncate">{employee.email}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <EmployeeList 
+              initialEmployees={employees} 
+              hasMore={hasMoreEmployees} 
+            />
           </section>
         </div>
       </main>

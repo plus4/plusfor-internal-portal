@@ -43,4 +43,16 @@ INSERT INTO announcements (title, content) VALUES
 INSERT INTO employees (name, department, position, email) VALUES
   ('山田 太郎', '開発部', 'シニアエンジニア', 'yamada@example.com'),
   ('鈴木 花子', '営業部', 'マネージャー', 'suzuki@example.com'),
-  ('佐藤 次郎', '人事部', '部長', 'sato@example.com'); 
+  ('佐藤 次郎', '人事部', '部長', 'sato@example.com'),
+  ('田中 美咲', '開発部', 'フロントエンドエンジニア', 'tanaka@example.com'),
+  ('伊藤 健太', '開発部', 'バックエンドエンジニア', 'ito@example.com'),
+  ('渡辺 真理', '営業部', '営業担当', 'watanabe@example.com'),
+  ('高橋 和也', '開発部', 'テックリード', 'takahashi@example.com'),
+  ('小林 恵子', '人事部', '人事担当', 'kobayashi@example.com'),
+  ('加藤 大輔', '開発部', 'インフラエンジニア', 'kato@example.com'),
+  ('吉田 優子', '営業部', '営業担当', 'yoshida@example.com'),
+  ('山本 直樹', '開発部', 'QAエンジニア', 'yamamoto@example.com'),
+  ('中村 美穂', '人事部', '採用担当', 'nakamura@example.com'),
+  ('松本 翔太', '開発部', 'モバイルエンジニア', 'matsumoto@example.com'),
+  ('井上 裕子', '営業部', '営業担当', 'inoue@example.com'),
+  ('木村 健一', '開発部', 'セキュリティエンジニア', 'kimura@example.com'); 

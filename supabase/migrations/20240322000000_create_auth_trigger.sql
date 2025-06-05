@@ -1,6 +1,8 @@
--- Drop existing function and trigger
+-- Drop existing functions and triggers
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP TRIGGER IF EXISTS on_auth_user_updated ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
+DROP FUNCTION IF EXISTS public.handle_user_update();
 
 -- Create function to handle new user registration
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -19,36 +21,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Create trigger
+-- Create function to handle user updates
+CREATE OR REPLACE FUNCTION public.handle_user_update()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Check if the user exists in the users table
+  IF NOT EXISTS (SELECT 1 FROM public.users WHERE id = NEW.id) THEN
+    INSERT INTO public.users (id, name, department, position, email)
+    VALUES (
+      NEW.id,
+      COALESCE(NEW.raw_user_meta_data->>'name', '未設定'),
+      COALESCE(NEW.raw_user_meta_data->>'department', '未設定'),
+      COALESCE(NEW.raw_user_meta_data->>'position', '未設定'),
+      NEW.email
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create triggers
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 既存のユーザーに対して従業員レコードが存在しない場合に作成する関数
-CREATE OR REPLACE FUNCTION public.create_missing_employee_records()
-RETURNS void AS $$
-DECLARE
-  auth_user RECORD;
-BEGIN
-  FOR auth_user IN SELECT id, email FROM auth.users
-  LOOP
-    -- 従業員レコードが存在しない場合のみ作成
-    IF NOT EXISTS (SELECT 1 FROM public.employees WHERE id = auth_user.id) THEN
-      INSERT INTO public.employees (id, name, department, position, email)
-      VALUES (
-        auth_user.id,
-        SPLIT_PART(auth_user.email, '@', 1),
-        '未設定',
-        '未設定',
-        auth_user.email
-      );
-    END IF;
-  END LOOP;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 既存のユーザーに対して従業員レコードを作成
-SELECT public.create_missing_employee_records();
-
--- 関数を削除（一度だけ実行するため）
-DROP FUNCTION public.create_missing_employee_records(); 
+CREATE TRIGGER on_auth_user_updated
+  AFTER UPDATE ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_user_update(); 

@@ -126,10 +126,19 @@ export async function POST(request: Request) {
     }
     console.log("Authユーザー作成成功:", authData);
 
-    // 2. employeesテーブルにユーザーを追加
-    console.log("employeesテーブルへの追加開始");
-    const { error: dbError } = await supabaseAdmin.from("employees").insert([
+    if (!authData.user) {
+      console.error("Authユーザーデータが存在しません");
+      return NextResponse.json(
+        { error: "ユーザーデータの取得に失敗しました" },
+        { status: 500 }
+      );
+    }
+
+    // 2. usersテーブルにユーザーを追加
+    console.log("usersテーブルへの追加開始");
+    const { error: dbError } = await supabaseAdmin.from("users").insert([
       {
+        id: authData.user.id,
         name,
         department,
         position,
@@ -138,10 +147,10 @@ export async function POST(request: Request) {
     ]);
 
     if (dbError) {
-      console.error("employeesテーブル追加エラー:", dbError);
+      console.error("usersテーブル追加エラー:", dbError);
       // ユーザー作成に失敗した場合、Authからも削除
       console.log("Authユーザーの削除開始（ロールバック）");
-      const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(email);
+      const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       if (deleteError) {
         console.error("Authユーザー削除エラー（ロールバック）:", deleteError);
       }
@@ -150,7 +159,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    console.log("employeesテーブルへの追加成功");
+    console.log("usersテーブルへの追加成功");
 
     console.log("=== ユーザー登録処理完了 ===");
     return NextResponse.json({
@@ -199,9 +208,9 @@ export async function DELETE(request: Request) {
       );
     }
 
-    // 2. employeesテーブルからユーザーを削除
+    // 2. usersテーブルからユーザーを削除
     const { error: dbError } = await supabaseAdmin
-      .from("employees")
+      .from("users")
       .delete()
       .eq("email", email);
 

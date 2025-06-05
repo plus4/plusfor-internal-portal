@@ -1,11 +1,11 @@
 import { DashboardContent } from "./components/dashboard-content";
 import { Header } from "@/components/header";
-import { getAnnouncements, getEmployees } from "@/lib/api";
+import { getAnnouncements, getUsers } from "@/lib/api";
 
 export default async function DashboardPage() {
-  const [announcements, employees] = await Promise.all([
+  const [announcements, users] = await Promise.all([
     getAnnouncements(),
-    getEmployees(),
+    getUsers(),
   ]);
 
   return (
@@ -14,8 +14,8 @@ export default async function DashboardPage() {
         <Header />
         <DashboardContent
           announcements={announcements}
-          employees={employees.data}
-          hasMoreEmployees={employees.hasMore}
+          users={users.data}
+          hasMoreUsers={users.hasMore}
         />
       </div>
     </div>

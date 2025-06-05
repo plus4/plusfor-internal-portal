@@ -3,10 +3,10 @@ DROP POLICY IF EXISTS "Allow authenticated users to read announcements" ON annou
 DROP POLICY IF EXISTS "Allow authenticated users to create announcements" ON announcements;
 DROP POLICY IF EXISTS "Allow authenticated users to update announcements" ON announcements;
 DROP POLICY IF EXISTS "Allow authenticated users to delete announcements" ON announcements;
-DROP POLICY IF EXISTS "Allow authenticated users to read employees" ON employees;
+DROP POLICY IF EXISTS "Allow authenticated users to read users" ON users;
 
 DROP TABLE IF EXISTS announcements;
-DROP TABLE IF EXISTS employees;
+DROP TABLE IF EXISTS users;
 
 -- Create announcements table
 CREATE TABLE announcements (
@@ -18,8 +18,8 @@ CREATE TABLE announcements (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
--- Create employees table
-CREATE TABLE employees (
+-- Create users table
+CREATE TABLE users (
   id UUID PRIMARY KEY REFERENCES auth.users(id),
   name TEXT NOT NULL,
   department TEXT NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE employees (
 
 -- Create RLS policies
 ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 -- Allow authenticated users to read announcements
 CREATE POLICY "Allow authenticated users to read announcements"
@@ -58,9 +58,9 @@ CREATE POLICY "Allow authenticated users to delete announcements"
   TO authenticated
   USING (true);
 
--- Allow authenticated users to read employees
-CREATE POLICY "Allow authenticated users to read employees"
-  ON employees FOR SELECT
+-- Allow authenticated users to read users
+CREATE POLICY "Allow authenticated users to read users"
+  ON users FOR SELECT
   TO authenticated
   USING (true);
 

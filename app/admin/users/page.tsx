@@ -51,7 +51,7 @@ export default function UsersPage() {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from("employees")
+        .from("users")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -109,7 +109,7 @@ export default function UsersPage() {
     try {
       setIsLoading(true);
       const { error } = await supabase
-        .from("employees")
+        .from("users")
         .update({
           name: formData.name,
           department: formData.department,

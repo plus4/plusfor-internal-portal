@@ -1,19 +1,19 @@
 'use client';
 
 import Link from "next/link";
-import { Announcement, Employee } from "@/lib/types";
-import { EmployeeList } from "./employee-list";
+import { Announcement, User } from "@/lib/types";
+import { UserList } from "./user-list";
 
 type DashboardContentProps = {
   announcements: Announcement[];
-  employees: Employee[];
-  hasMoreEmployees: boolean;
+  users: User[];
+  hasMoreUsers: boolean;
 };
 
-export function DashboardContent({ 
-  announcements, 
-  employees, 
-  hasMoreEmployees 
+export function DashboardContent({
+  announcements,
+  users,
+  hasMoreUsers
 }: DashboardContentProps) {
   return (
     <div className="min-h-screen flex">
@@ -87,9 +87,9 @@ export function DashboardContent({
                 すべて見る
               </Link>
             </div>
-            <EmployeeList 
-              initialEmployees={employees} 
-              hasMore={hasMoreEmployees} 
+            <UserList 
+              initialUsers={users} 
+              hasMore={hasMoreUsers} 
             />
           </section>
         </div>

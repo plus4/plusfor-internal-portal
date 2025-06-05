@@ -6,8 +6,8 @@ DROP FUNCTION IF EXISTS public.handle_new_user();
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Insert into employees table
-  INSERT INTO public.employees (id, name, department, position, email)
+  -- Insert into users table
+  INSERT INTO public.users (id, name, department, position, email)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'name', '名前未設定'),

@@ -1,3 +1,13 @@
+-- Drop existing tables and policies
+DROP POLICY IF EXISTS "Allow authenticated users to read announcements" ON announcements;
+DROP POLICY IF EXISTS "Allow authenticated users to create announcements" ON announcements;
+DROP POLICY IF EXISTS "Allow authenticated users to update announcements" ON announcements;
+DROP POLICY IF EXISTS "Allow authenticated users to delete announcements" ON announcements;
+DROP POLICY IF EXISTS "Allow authenticated users to read employees" ON employees;
+
+DROP TABLE IF EXISTS announcements;
+DROP TABLE IF EXISTS employees;
+
 -- Create announcements table
 CREATE TABLE announcements (
   id BIGSERIAL PRIMARY KEY,

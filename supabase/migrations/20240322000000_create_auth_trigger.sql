@@ -1,23 +1,26 @@
--- ユーザー登録時に従業員レコードを作成する関数
+-- Drop existing function and trigger
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+
+-- Create function to handle new user registration
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- 新規ユーザーのメールアドレスから従業員情報を取得
-  -- 注: 実際の運用では、別の方法（例: 管理画面からの登録）で従業員情報を登録することを推奨
+  -- Insert into employees table
   INSERT INTO public.employees (id, name, department, position, email)
   VALUES (
     NEW.id,
-    SPLIT_PART(NEW.email, '@', 1), -- メールアドレスの@より前の部分を名前として使用
-    '未設定', -- デフォルトの部署
-    '未設定', -- デフォルトの役職
+    COALESCE(NEW.raw_user_meta_data->>'name', '名前未設定'),
+    COALESCE(NEW.raw_user_meta_data->>'department', '部署未設定'),
+    COALESCE(NEW.raw_user_meta_data->>'position', '役職未設定'),
     NEW.email
   );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 新規ユーザー作成時にトリガーを発火
-CREATE OR REPLACE TRIGGER on_auth_user_created
+-- Create trigger
+CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 

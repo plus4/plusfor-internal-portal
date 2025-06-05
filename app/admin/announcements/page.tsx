@@ -64,24 +64,30 @@ export default function AnnouncementsPage() {
   };
 
   const handleCreate = async () => {
-    const { error } = await supabase.from("announcements").insert([
-      {
-        title,
-        content,
-        is_published: isPublished,
-      },
-    ]);
+    try {
+      const { data, error } = await supabase.from("announcements").insert([
+        {
+          title,
+          content,
+          is_published: isPublished,
+        },
+      ]).select();
 
-    if (error) {
-      console.error("Error creating announcement:", error);
-      return;
+      if (error) {
+        console.error("Error creating announcement:", error);
+        alert(`お知らせの作成に失敗しました: ${error.message}`);
+        return;
+      }
+
+      setTitle("");
+      setContent("");
+      setIsPublished(false);
+      setIsDialogOpen(false);
+      fetchAnnouncements();
+    } catch (err) {
+      console.error("Unexpected error creating announcement:", err);
+      alert("予期せぬエラーが発生しました。もう一度お試しください。");
     }
-
-    setTitle("");
-    setContent("");
-    setIsPublished(false);
-    setIsDialogOpen(false);
-    fetchAnnouncements();
   };
 
   const handleUpdate = async () => {

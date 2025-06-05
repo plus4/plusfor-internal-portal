@@ -1,4 +1,5 @@
 import { DashboardContent } from "./components/dashboard-content";
+import { Header } from "@/app/components/header";
 import { getAnnouncements, getEmployees } from "@/lib/api";
 
 export default async function DashboardPage() {
@@ -9,11 +10,14 @@ export default async function DashboardPage() {
     ]);
 
     return (
-      <DashboardContent 
-        announcements={announcements} 
-        employees={employeesResult.data} 
-        hasMoreEmployees={employeesResult.hasMore}
-      />
+      <div className="min-h-screen">
+        <Header />
+        <DashboardContent 
+          announcements={announcements} 
+          employees={employeesResult.data} 
+          hasMoreEmployees={employeesResult.hasMore}
+        />
+      </div>
     );
   } catch (error) {
     console.error("Error loading dashboard data:", error);

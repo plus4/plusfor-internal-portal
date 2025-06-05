@@ -1,35 +1,23 @@
 import { DashboardContent } from "./components/dashboard-content";
-import { Header } from "@/app/components/header";
+import { Header } from "@/components/header";
 import { getAnnouncements, getEmployees } from "@/lib/api";
 
 export default async function DashboardPage() {
-  try {
-    const [announcements, employeesResult] = await Promise.all([
-      getAnnouncements(),
-      getEmployees(1, 6),
-    ]);
+  const [announcements, employees] = await Promise.all([
+    getAnnouncements(),
+    getEmployees(),
+  ]);
 
-    return (
-      <div className="min-h-screen">
+  return (
+    <div className="flex h-screen">
+      <div className="flex-1 flex flex-col">
         <Header />
-        <DashboardContent 
-          announcements={announcements} 
-          employees={employeesResult.data} 
-          hasMoreEmployees={employeesResult.hasMore}
+        <DashboardContent
+          announcements={announcements}
+          employees={employees.data}
+          hasMoreEmployees={employees.hasMore}
         />
       </div>
-    );
-  } catch (error) {
-    console.error("Error loading dashboard data:", error);
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">エラーが発生しました</h1>
-          <p className="text-muted-foreground">
-            データの読み込み中にエラーが発生しました。しばらく経ってから再度お試しください。
-          </p>
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 } 

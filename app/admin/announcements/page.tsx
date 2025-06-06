@@ -1,8 +1,5 @@
 "use client";
 
-// モジュールが読み込まれた時点でのログ
-console.log("[AnnouncementsPage] Module loaded");
-
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -40,8 +37,6 @@ type Announcement = {
 };
 
 export default function AnnouncementsPage() {
-  console.log("[AnnouncementsPage] Component function called");
-
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -50,30 +45,15 @@ export default function AnnouncementsPage() {
   const [isPublished, setIsPublished] = useState(false);
   const supabase = createClient();
 
-  // コンポーネントのマウントを確認するためのuseEffect
-  useEffect(() => {
-    console.log("[AnnouncementsPage] Component mounted");
-    return () => {
-      console.log("[AnnouncementsPage] Component unmounted");
-    };
-  }, []);
-
   const fetchAnnouncements = useCallback(async () => {
-    console.log("[AnnouncementsPage] Starting to fetch announcements...");
     const { data, error } = await supabase
       .from("announcements")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.log("[AnnouncementsPage] Error fetching announcements:", error);
       return;
     }
-
-    console.log("[AnnouncementsPage] Announcements fetched successfully:", {
-      count: data?.length || 0,
-      firstAnnouncement: data?.[0] || null
-    });
 
     if (data) {
       setAnnouncements(data);
@@ -81,12 +61,10 @@ export default function AnnouncementsPage() {
   }, [supabase]);
 
   useEffect(() => {
-    console.log("[AnnouncementsPage] useEffect triggered, calling fetchAnnouncements");
     fetchAnnouncements();
   }, [fetchAnnouncements]);
 
   const handleCreate = async () => {
-    console.log("[AnnouncementsPage] Starting to create announcement...");
     try {
       const { error } = await supabase.from("announcements").insert([
         {
@@ -97,19 +75,16 @@ export default function AnnouncementsPage() {
       ]).select();
 
       if (error) {
-        console.log("[AnnouncementsPage] Error creating announcement:", error);
         alert(`お知らせの作成に失敗しました: ${error.message}`);
         return;
       }
 
-      console.log("[AnnouncementsPage] Announcement created successfully");
       setTitle("");
       setContent("");
       setIsPublished(false);
       setIsDialogOpen(false);
       fetchAnnouncements();
     } catch (err) {
-      console.log("[AnnouncementsPage] Unexpected error creating announcement:", err);
       alert("予期せぬエラーが発生しました。もう一度お試しください。");
     }
   };
@@ -117,7 +92,6 @@ export default function AnnouncementsPage() {
   const handleUpdate = async () => {
     if (!editingAnnouncement) return;
 
-    console.log("[AnnouncementsPage] Starting to update announcement:", editingAnnouncement.id);
     const { error } = await supabase
       .from("announcements")
       .update({
@@ -129,11 +103,9 @@ export default function AnnouncementsPage() {
       .eq("id", editingAnnouncement.id);
 
     if (error) {
-      console.log("[AnnouncementsPage] Error updating announcement:", error);
       return;
     }
 
-    console.log("[AnnouncementsPage] Announcement updated successfully");
     setTitle("");
     setContent("");
     setIsPublished(false);
@@ -145,15 +117,12 @@ export default function AnnouncementsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("このお知らせを削除してもよろしいですか？")) return;
 
-    console.log("[AnnouncementsPage] Starting to delete announcement:", id);
     const { error } = await supabase.from("announcements").delete().eq("id", id);
 
     if (error) {
-      console.log("[AnnouncementsPage] Error deleting announcement:", error);
       return;
     }
 
-    console.log("[AnnouncementsPage] Announcement deleted successfully");
     fetchAnnouncements();
   };
 
@@ -175,7 +144,6 @@ export default function AnnouncementsPage() {
       .eq("id", announcement.id);
 
     if (error) {
-      console.log("Error toggling announcement publish status:", error);
       return;
     }
 

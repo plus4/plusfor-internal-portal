@@ -1,8 +1,5 @@
 "use client";
 
-// モジュールが読み込まれた時点でのログ
-console.log("[UsersPage] Module loaded");
-
 import { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../layout";
 import { Button } from "@/components/ui/button";
@@ -37,8 +34,6 @@ type User = {
 };
 
 export default function UsersPage() {
-  console.log("[UsersPage] Component function called");
-
   const [users, setUsers] = useState<User[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -46,29 +41,15 @@ export default function UsersPage() {
   const [fullName, setFullName] = useState("");
   const supabase = useSupabase();
 
-  useEffect(() => {
-    console.log("[UsersPage] Component mounted");
-    return () => {
-      console.log("[UsersPage] Component unmounted");
-    };
-  }, []);
-
   const fetchUsers = useCallback(async () => {
-    console.log("[UsersPage] Starting to fetch users...");
     const { data, error } = await supabase
       .from("users")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.log("[UsersPage] Error fetching users:", error);
       return;
     }
-
-    console.log("[UsersPage] Users fetched successfully:", {
-      count: data?.length || 0,
-      firstUser: data?.[0] || null
-    });
 
     if (data) {
       setUsers(data);
@@ -76,12 +57,10 @@ export default function UsersPage() {
   }, [supabase]);
 
   useEffect(() => {
-    console.log("[UsersPage] useEffect triggered, calling fetchUsers");
     fetchUsers();
   }, [fetchUsers]);
 
   const handleCreate = async () => {
-    console.log("[UsersPage] Starting to create user...");
     try {
       const { error } = await supabase.from("users").insert([
         {
@@ -91,18 +70,15 @@ export default function UsersPage() {
       ]).select();
 
       if (error) {
-        console.log("[UsersPage] Error creating user:", error);
         alert(`ユーザーの作成に失敗しました: ${error.message}`);
         return;
       }
 
-      console.log("[UsersPage] User created successfully");
       setEmail("");
       setFullName("");
       setIsDialogOpen(false);
       fetchUsers();
     } catch (err) {
-      console.log("[UsersPage] Unexpected error creating user:", err);
       alert("予期せぬエラーが発生しました。もう一度お試しください。");
     }
   };
@@ -110,7 +86,6 @@ export default function UsersPage() {
   const handleUpdate = async () => {
     if (!editingUser) return;
 
-    console.log("[UsersPage] Starting to update user:", editingUser.id);
     const { error } = await supabase
       .from("users")
       .update({
@@ -121,11 +96,9 @@ export default function UsersPage() {
       .eq("id", editingUser.id);
 
     if (error) {
-      console.log("[UsersPage] Error updating user:", error);
       return;
     }
 
-    console.log("[UsersPage] User updated successfully");
     setEmail("");
     setFullName("");
     setEditingUser(null);
@@ -136,15 +109,12 @@ export default function UsersPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("このユーザーを削除してもよろしいですか？")) return;
 
-    console.log("[UsersPage] Starting to delete user:", id);
     const { error } = await supabase.from("users").delete().eq("id", id);
 
     if (error) {
-      console.log("[UsersPage] Error deleting user:", error);
       return;
     }
 
-    console.log("[UsersPage] User deleted successfully");
     fetchUsers();
   };
 

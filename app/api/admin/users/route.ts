@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 // 環境変数のチェック
@@ -12,41 +12,31 @@ if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
   throw new Error("Missing Supabase environment variables");
 }
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+// 型アサーションを追加
+const supabaseUrlString = supabaseUrl as string;
+const supabaseAnonKeyString = supabaseAnonKey as string;
+
+const supabaseAdmin = createClient(supabaseUrlString, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
   },
 });
 
-type CookieOptions = {
-  name: string;
-  value: string;
-  expires?: Date;
-  maxAge?: number;
-  domain?: string;
-  path?: string;
-  secure?: boolean;
-  httpOnly?: boolean;
-  sameSite?: 'strict' | 'lax' | 'none';
-};
-
 // 認証チェック用のミドルウェア
 async function checkAuth() {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createServerClient(
-      supabaseUrl,
-      supabaseAnonKey,
+      supabaseUrlString,
+      supabaseAnonKeyString,
       {
         cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-          set(name: string, value: string, options: CookieOptions) {
+          get: (name: string) => cookieStore.get(name)?.value,
+          set: (name: string, value: string, options: CookieOptions) => {
             cookieStore.set({ name, value, ...options });
           },
-          remove(name: string, options: CookieOptions) {
+          remove: (name: string, options: CookieOptions) => {
             cookieStore.set({ name, value: "", ...options });
           },
         },

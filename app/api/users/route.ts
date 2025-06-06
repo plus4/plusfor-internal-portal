@@ -10,22 +10,24 @@ export async function GET(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
-        cookies: cookieStore,
+        cookies: {
+          get: (name: string) => cookieStore.get(name)?.value,
+          set: (name: string, value: string, options: any) => {
+            cookieStore.set({ name, value, ...options });
+          },
+          remove: (name: string, options: any) => {
+            cookieStore.set({ name, value: "", ...options });
+          },
+        },
       }
     );
 
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
-    if (authError) {
+    if (authError || !session) {
+      console.error("Authentication error:", authError);
       return Response.json(
-        { error: "認証エラーが発生しました" },
-        { status: 401 }
-      );
-    }
-
-    if (!session) {
-      return Response.json(
-        { error: "認証が必要です" },
+        { data: [], hasMore: false, error: "認証が必要です" },
         { status: 401 }
       );
     }
@@ -37,8 +39,9 @@ export async function GET(request: NextRequest) {
     const result = await getUsers(page, pageSize);
     return Response.json(result);
   } catch (error) {
+    console.error("Error in GET /api/users:", error);
     return Response.json(
-      { error: "Failed to fetch users" },
+      { data: [], hasMore: false, error: "Failed to fetch users" },
       { status: 500 }
     );
   }

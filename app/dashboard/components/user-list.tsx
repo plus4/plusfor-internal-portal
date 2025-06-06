@@ -23,11 +23,18 @@ export function UserList({ initialUsers, hasMore: initialHasMore }: UserListProp
     try {
       const response = await fetch(`/api/users?page=${page + 1}`);
       const { data, hasMore: newHasMore } = await response.json();
-      setUsers(prev => [...prev, ...data]);
-      setHasMore(newHasMore);
-      setPage(prev => prev + 1);
+      
+      if (Array.isArray(data)) {
+        setUsers(prev => [...prev, ...data]);
+        setHasMore(newHasMore);
+        setPage(prev => prev + 1);
+      } else {
+        console.error('Invalid data format received:', data);
+        setHasMore(false);
+      }
     } catch (error) {
       console.error('Error loading more users:', error);
+      setHasMore(false);
     } finally {
       setIsLoading(false);
     }
@@ -36,11 +43,13 @@ export function UserList({ initialUsers, hasMore: initialHasMore }: UserListProp
   const lastUserElementRef = useCallback((node: HTMLDivElement | null) => {
     if (isLoading) return;
     if (observer.current) observer.current.disconnect();
+    
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore) {
         loadMore();
       }
     });
+    
     if (node) observer.current.observe(node);
   }, [isLoading, hasMore, loadMore]);
 

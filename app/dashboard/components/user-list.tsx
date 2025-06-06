@@ -15,18 +15,8 @@ export function UserList({ initialUsers, hasMore: initialHasMore }: UserListProp
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const observer = useRef<IntersectionObserver | null>(null);
-  const lastUserElementRef = useCallback((node: HTMLDivElement | null) => {
-    if (isLoading) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        loadMore();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [isLoading, hasMore]);
 
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (isLoading || !hasMore) return;
 
     setIsLoading(true);
@@ -41,7 +31,18 @@ export function UserList({ initialUsers, hasMore: initialHasMore }: UserListProp
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, hasMore, page]);
+
+  const lastUserElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMore();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [isLoading, hasMore, loadMore]);
 
   return (
     <div className="space-y-4">

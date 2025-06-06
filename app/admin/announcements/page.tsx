@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,11 +45,7 @@ export default function AnnouncementsPage() {
   const [isPublished, setIsPublished] = useState(false);
   const supabase = createClient();
 
-  useEffect(() => {
-    fetchAnnouncements();
-  }, []);
-
-  const fetchAnnouncements = async () => {
+  const fetchAnnouncements = useCallback(async () => {
     const { data, error } = await supabase
       .from("announcements")
       .select("*")
@@ -60,12 +56,18 @@ export default function AnnouncementsPage() {
       return;
     }
 
-    setAnnouncements(data || []);
-  };
+    if (data) {
+      setAnnouncements(data);
+    }
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, [fetchAnnouncements]);
 
   const handleCreate = async () => {
     try {
-      const { data, error } = await supabase.from("announcements").insert([
+      const { error } = await supabase.from("announcements").insert([
         {
           title,
           content,

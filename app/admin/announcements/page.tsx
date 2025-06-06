@@ -1,5 +1,8 @@
 "use client";
 
+// モジュールが読み込まれた時点でのログ
+console.log("[AnnouncementsPage] Module loaded");
+
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -37,6 +40,8 @@ type Announcement = {
 };
 
 export default function AnnouncementsPage() {
+  console.log("[AnnouncementsPage] Component function called");
+
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -45,16 +50,30 @@ export default function AnnouncementsPage() {
   const [isPublished, setIsPublished] = useState(false);
   const supabase = createClient();
 
+  // コンポーネントのマウントを確認するためのuseEffect
+  useEffect(() => {
+    console.log("[AnnouncementsPage] Component mounted");
+    return () => {
+      console.log("[AnnouncementsPage] Component unmounted");
+    };
+  }, []);
+
   const fetchAnnouncements = useCallback(async () => {
+    console.log("[AnnouncementsPage] Starting to fetch announcements...");
     const { data, error } = await supabase
       .from("announcements")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching announcements:", error);
+      console.log("[AnnouncementsPage] Error fetching announcements:", error);
       return;
     }
+
+    console.log("[AnnouncementsPage] Announcements fetched successfully:", {
+      count: data?.length || 0,
+      firstAnnouncement: data?.[0] || null
+    });
 
     if (data) {
       setAnnouncements(data);
@@ -62,10 +81,12 @@ export default function AnnouncementsPage() {
   }, [supabase]);
 
   useEffect(() => {
+    console.log("[AnnouncementsPage] useEffect triggered, calling fetchAnnouncements");
     fetchAnnouncements();
   }, [fetchAnnouncements]);
 
   const handleCreate = async () => {
+    console.log("[AnnouncementsPage] Starting to create announcement...");
     try {
       const { error } = await supabase.from("announcements").insert([
         {
@@ -76,18 +97,19 @@ export default function AnnouncementsPage() {
       ]).select();
 
       if (error) {
-        console.error("Error creating announcement:", error);
+        console.log("[AnnouncementsPage] Error creating announcement:", error);
         alert(`お知らせの作成に失敗しました: ${error.message}`);
         return;
       }
 
+      console.log("[AnnouncementsPage] Announcement created successfully");
       setTitle("");
       setContent("");
       setIsPublished(false);
       setIsDialogOpen(false);
       fetchAnnouncements();
     } catch (err) {
-      console.error("Unexpected error creating announcement:", err);
+      console.log("[AnnouncementsPage] Unexpected error creating announcement:", err);
       alert("予期せぬエラーが発生しました。もう一度お試しください。");
     }
   };
@@ -95,6 +117,7 @@ export default function AnnouncementsPage() {
   const handleUpdate = async () => {
     if (!editingAnnouncement) return;
 
+    console.log("[AnnouncementsPage] Starting to update announcement:", editingAnnouncement.id);
     const { error } = await supabase
       .from("announcements")
       .update({
@@ -106,10 +129,11 @@ export default function AnnouncementsPage() {
       .eq("id", editingAnnouncement.id);
 
     if (error) {
-      console.error("Error updating announcement:", error);
+      console.log("[AnnouncementsPage] Error updating announcement:", error);
       return;
     }
 
+    console.log("[AnnouncementsPage] Announcement updated successfully");
     setTitle("");
     setContent("");
     setIsPublished(false);
@@ -121,13 +145,15 @@ export default function AnnouncementsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("このお知らせを削除してもよろしいですか？")) return;
 
+    console.log("[AnnouncementsPage] Starting to delete announcement:", id);
     const { error } = await supabase.from("announcements").delete().eq("id", id);
 
     if (error) {
-      console.error("Error deleting announcement:", error);
+      console.log("[AnnouncementsPage] Error deleting announcement:", error);
       return;
     }
 
+    console.log("[AnnouncementsPage] Announcement deleted successfully");
     fetchAnnouncements();
   };
 
@@ -149,7 +175,7 @@ export default function AnnouncementsPage() {
       .eq("id", announcement.id);
 
     if (error) {
-      console.error("Error toggling announcement publish status:", error);
+      console.log("Error toggling announcement publish status:", error);
       return;
     }
 
@@ -157,7 +183,7 @@ export default function AnnouncementsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">お知らせ管理</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -173,28 +199,21 @@ export default function AnnouncementsPage() {
                 お知らせのタイトルと内容を入力してください。
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <label htmlFor="title" className="text-sm font-medium">
-                  タイトル
-                </label>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="title">タイトル</Label>
                 <Input
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="お知らせのタイトル"
                 />
               </div>
-              <div className="space-y-2">
-                <label htmlFor="content" className="text-sm font-medium">
-                  内容
-                </label>
+              <div className="grid gap-2">
+                <Label htmlFor="content">内容</Label>
                 <Textarea
                   id="content"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  placeholder="お知らせの内容"
-                  rows={5}
                 />
               </div>
               <div className="flex items-center space-x-2">
@@ -208,20 +227,8 @@ export default function AnnouncementsPage() {
             </div>
             <DialogFooter>
               <Button
-                variant="outline"
-                onClick={() => {
-                  setIsDialogOpen(false);
-                  setEditingAnnouncement(null);
-                  setTitle("");
-                  setContent("");
-                  setIsPublished(false);
-                }}
-              >
-                キャンセル
-              </Button>
-              <Button
+                type="submit"
                 onClick={editingAnnouncement ? handleUpdate : handleCreate}
-                disabled={!title || !content}
               >
                 {editingAnnouncement ? "更新" : "作成"}
               </Button>
@@ -244,24 +251,11 @@ export default function AnnouncementsPage() {
                     })}
                   </CardDescription>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleTogglePublish(announcement)}
-                    title={announcement.is_published ? "非公開にする" : "公開する"}
-                  >
-                    {announcement.is_published ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
-                  </Button>
+                <div className="flex items-center space-x-2">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleEdit(announcement)}
-                    title="編集"
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -269,19 +263,26 @@ export default function AnnouncementsPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(announcement.id)}
-                    title="削除"
                   >
                     <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleTogglePublish(announcement)}
+                  >
+                    {announcement.is_published ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <p className="whitespace-pre-wrap">{announcement.content}</p>
-            </CardContent>
           </Card>
         ))}
       </div>
-    </div>
+    </>
   );
 } 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,10 +15,7 @@ import {
 import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient();
 
 type User = {
   id: string;
@@ -108,16 +105,25 @@ export default function UsersPage() {
 
     try {
       setIsLoading(true);
-      const { error } = await supabase
-        .from("users")
-        .update({
+
+      const response = await fetch("/api/admin/users", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: selectedUser.id,
           name: formData.name,
           department: formData.department,
           position: formData.position,
-        })
-        .eq("id", selectedUser.id);
+        }),
+      });
 
-      if (error) throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
 
       alert("ユーザー情報を更新しました");
       setIsEditDialogOpen(false);
@@ -140,13 +146,13 @@ export default function UsersPage() {
     }
   };
 
-  const handleDelete = async (email: string) => {
+  const handleDelete = async (userId: string) => {
     if (!confirm("このユーザーを削除してもよろしいですか？")) return;
 
     try {
       setIsLoading(true);
 
-      const response = await fetch(`/api/admin/users?email=${encodeURIComponent(email)}`, {
+      const response = await fetch(`/api/admin/users?id=${encodeURIComponent(userId)}`, {
         method: "DELETE",
       });
 
@@ -255,38 +261,38 @@ export default function UsersPage() {
         </Dialog>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="bg-card rounded-lg shadow border overflow-hidden">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted/50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 名前
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 部署
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 役職
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 メールアドレス
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 作成日
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 操作
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-card divide-y divide-border">
             {users.map((user) => (
-              <tr key={user.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{user.department}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{user.position}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
+              <tr key={user.id} className="hover:bg-muted/50">
+                <td className="px-6 py-4 whitespace-nowrap text-foreground">{user.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-foreground">{user.department}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-foreground">{user.position}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-foreground">{user.email}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-foreground">
                   {new Date(user.created_at).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
@@ -301,7 +307,7 @@ export default function UsersPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(user.email)}
+                    onClick={() => handleDelete(user.id)}
                     disabled={isLoading}
                   >
                     <Trash2 className="h-4 w-4" />

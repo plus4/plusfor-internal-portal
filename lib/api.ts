@@ -1,12 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
 import { Announcement, User } from "./types";
 
-export async function getAnnouncements(): Promise<Announcement[]> {
+export async function getAnnouncements(): Promise<(Announcement & { is_read: boolean })[]> {
   const supabase = await createClient();
+  
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error("認証が必要です");
+  }
+
+  // Get announcements with read status
   const { data, error } = await supabase
     .from("announcements")
-    .select("*")
+    .select(`
+      *,
+      announcement_reads!left(user_id)
+    `)
     .eq("is_published", true)
+    .eq("announcement_reads.user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(3);
 
@@ -15,7 +28,12 @@ export async function getAnnouncements(): Promise<Announcement[]> {
     throw error;
   }
 
-  return data;
+  // Transform data to include is_read flag
+  return data.map(announcement => ({
+    ...announcement,
+    is_read: announcement.announcement_reads && announcement.announcement_reads.length > 0,
+    announcement_reads: undefined // Remove the join data
+  }));
 }
 
 export async function getUsers(page: number = 1, pageSize: number = 6): Promise<{

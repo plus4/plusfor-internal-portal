@@ -97,12 +97,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, department, position, email } = body;
+    const { name, department, position, email, user_type } = body;
 
     // 必須項目のチェック
     console.log("必須項目のチェック開始");
-    if (!name || !department || !position || !email) {
-      console.log("必須項目が不足:", { name, department, position, email });
+    if (!name || !department || !position || !email || !user_type) {
+      console.log("必須項目が不足:", { name, department, position, email, user_type });
       return NextResponse.json(
         { error: "必須項目が入力されていません" },
         { status: 400 }
@@ -121,6 +121,7 @@ export async function POST(request: Request) {
         name,
         department,
         position,
+        user_type,
       },
     });
 
@@ -187,6 +188,7 @@ export async function POST(request: Request) {
         department,
         position,
         email,
+        user_type,
       },
     });
   } catch (error) {
@@ -225,12 +227,12 @@ export async function PUT(request: Request) {
       );
     }
 
-    const { id, name, department, position } = body;
+    const { id, name, department, position, user_type } = body;
 
     // 必須項目のチェック
     console.log("必須項目のチェック開始");
-    if (!id || !name || !department || !position) {
-      console.log("必須項目が不足:", { id, name, department, position });
+    if (!id || !name || !department || !position || !user_type) {
+      console.log("必須項目が不足:", { id, name, department, position, user_type });
       return NextResponse.json(
         { error: "必須項目が入力されていません" },
         { status: 400 }
@@ -246,6 +248,7 @@ export async function PUT(request: Request) {
         name,
         department,
         position,
+        user_type,
       })
       .eq("id", id);
 
@@ -266,6 +269,7 @@ export async function PUT(request: Request) {
         name,
         department,
         position,
+        user_type,
       },
     });
   } catch (error) {

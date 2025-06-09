@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -18,7 +18,8 @@ export async function POST(
       );
     }
 
-    const announcementId = parseInt(params.id);
+    const resolvedParams = await params;
+    const announcementId = parseInt(resolvedParams.id);
     
     if (isNaN(announcementId)) {
       return NextResponse.json(

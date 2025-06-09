@@ -105,16 +105,25 @@ export default function UsersPage() {
 
     try {
       setIsLoading(true);
-      const { error } = await supabase
-        .from("users")
-        .update({
+
+      const response = await fetch("/api/admin/users", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: selectedUser.id,
           name: formData.name,
           department: formData.department,
           position: formData.position,
-        })
-        .eq("id", selectedUser.id);
+        }),
+      });
 
-      if (error) throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
 
       alert("ユーザー情報を更新しました");
       setIsEditDialogOpen(false);
@@ -137,13 +146,13 @@ export default function UsersPage() {
     }
   };
 
-  const handleDelete = async (email: string) => {
+  const handleDelete = async (userId: string) => {
     if (!confirm("このユーザーを削除してもよろしいですか？")) return;
 
     try {
       setIsLoading(true);
 
-      const response = await fetch(`/api/admin/users?email=${encodeURIComponent(email)}`, {
+      const response = await fetch(`/api/admin/users?id=${encodeURIComponent(userId)}`, {
         method: "DELETE",
       });
 
@@ -298,7 +307,7 @@ export default function UsersPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(user.email)}
+                    onClick={() => handleDelete(user.id)}
                     disabled={isLoading}
                   >
                     <Trash2 className="h-4 w-4" />

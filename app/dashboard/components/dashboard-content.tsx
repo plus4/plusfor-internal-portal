@@ -7,7 +7,6 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { createClient } from "@/lib/supabase/client";
 
 type DashboardContentProps = {
   announcements: (Announcement & { is_read: boolean })[];
@@ -23,7 +22,6 @@ export function DashboardContent({
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<(Announcement & { is_read: boolean }) | null>(null);
   const [announcementList, setAnnouncementList] = useState(announcements);
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClient();
 
   const handleAnnouncementClick = (announcement: Announcement & { is_read: boolean }) => {
     setSelectedAnnouncement(announcement);

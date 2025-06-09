@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { Announcement, User } from "@/lib/types";
 import { UserList } from "./user-list";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 type DashboardContentProps = {
-  announcements: Announcement[];
+  announcements: (Announcement & { is_read: boolean })[];
   users: User[];
   hasMoreUsers: boolean;
 };
@@ -15,6 +19,49 @@ export function DashboardContent({
   users,
   hasMoreUsers
 }: DashboardContentProps) {
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<(Announcement & { is_read: boolean }) | null>(null);
+  const [announcementList, setAnnouncementList] = useState(announcements);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleAnnouncementClick = (announcement: Announcement & { is_read: boolean }) => {
+    setSelectedAnnouncement(announcement);
+  };
+
+  const handleMarkAsRead = async () => {
+    if (!selectedAnnouncement || selectedAnnouncement.is_read) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/announcements/${selectedAnnouncement.id}/read`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('既読マークに失敗しました');
+      }
+
+      // Update the announcement list to mark as read
+      setAnnouncementList(prev => 
+        prev.map(ann => 
+          ann.id === selectedAnnouncement.id 
+            ? { ...ann, is_read: true }
+            : ann
+        )
+      );
+      
+      // Update the selected announcement
+      setSelectedAnnouncement(prev => 
+        prev ? { ...prev, is_read: true } : null
+      );
+
+    } catch (error) {
+      console.error('Error marking as read:', error);
+      alert('既読マークに失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
@@ -59,18 +106,24 @@ export function DashboardContent({
               </Link>
             </div>
             <div className="space-y-4">
-              {announcements.map((announcement) => (
+              {announcementList.map((announcement) => (
                 <div 
                   key={announcement.id}
-                  className="bg-card p-6 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                  className="bg-card p-6 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={() => handleAnnouncementClick(announcement)}
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-semibold">{announcement.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold">{announcement.title}</h3>
+                      {!announcement.is_read && (
+                        <Badge variant="destructive" className="text-xs">未読</Badge>
+                      )}
+                    </div>
                     <span className="text-sm text-muted-foreground">
                       {new Date(announcement.created_at).toLocaleDateString('ja-JP')}
                     </span>
                   </div>
-                  <p className="text-muted-foreground">{announcement.content}</p>
+                  <p className="text-muted-foreground line-clamp-2">{announcement.content}</p>
                 </div>
               ))}
             </div>
@@ -94,6 +147,39 @@ export function DashboardContent({
           </section>
         </div>
       </main>
+
+      {/* お知らせ詳細ダイアログ */}
+      <Dialog open={!!selectedAnnouncement} onOpenChange={(open) => !open && setSelectedAnnouncement(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedAnnouncement?.title}
+              {selectedAnnouncement && !selectedAnnouncement.is_read && (
+                <Badge variant="destructive" className="text-xs">未読</Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground">
+              {selectedAnnouncement && new Date(selectedAnnouncement.created_at).toLocaleDateString('ja-JP')}
+            </div>
+            <div className="whitespace-pre-wrap">
+              {selectedAnnouncement?.content}
+            </div>
+            {selectedAnnouncement && !selectedAnnouncement.is_read && (
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={handleMarkAsRead}
+                  disabled={isLoading}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {isLoading ? "処理中..." : "既読にする"}
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

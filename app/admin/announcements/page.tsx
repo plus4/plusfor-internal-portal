@@ -26,12 +26,22 @@ import { ja } from "date-fns/locale";
 import { Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { TargetAudience } from "@/lib/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 type Announcement = {
   id: string;
   title: string;
   content: string;
   is_published: boolean;
+  target_audience: TargetAudience;
   created_at: string;
   updated_at: string;
 };
@@ -43,6 +53,7 @@ export default function AnnouncementsPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPublished, setIsPublished] = useState(false);
+  const [targetAudience, setTargetAudience] = useState<TargetAudience>("ALL");
   const supabase = createClient();
 
   const fetchAnnouncements = useCallback(async () => {
@@ -72,6 +83,7 @@ export default function AnnouncementsPage() {
           title,
           content,
           is_published: isPublished,
+          target_audience: targetAudience,
         },
       ]).select();
 
@@ -84,6 +96,7 @@ export default function AnnouncementsPage() {
       setTitle("");
       setContent("");
       setIsPublished(false);
+      setTargetAudience("ALL");
       setIsDialogOpen(false);
       fetchAnnouncements();
     } catch (err) {
@@ -101,6 +114,7 @@ export default function AnnouncementsPage() {
         title,
         content,
         is_published: isPublished,
+        target_audience: targetAudience,
         updated_at: new Date().toISOString(),
       })
       .eq("id", editingAnnouncement.id);
@@ -113,6 +127,7 @@ export default function AnnouncementsPage() {
     setTitle("");
     setContent("");
     setIsPublished(false);
+    setTargetAudience("ALL");
     setEditingAnnouncement(null);
     setIsDialogOpen(false);
     fetchAnnouncements();
@@ -136,6 +151,7 @@ export default function AnnouncementsPage() {
     setTitle(announcement.title);
     setContent(announcement.content);
     setIsPublished(announcement.is_published);
+    setTargetAudience(announcement.target_audience);
     setIsDialogOpen(true);
   };
 
@@ -197,6 +213,24 @@ export default function AnnouncementsPage() {
                   rows={5}
                 />
               </div>
+              <div className="space-y-2">
+                <label htmlFor="target_audience" className="text-sm font-medium">
+                  対象
+                </label>
+                <Select
+                  value={targetAudience}
+                  onValueChange={(value: TargetAudience) => setTargetAudience(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="対象を選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">全員</SelectItem>
+                    <SelectItem value="EMPLOYEE">社員のみ</SelectItem>
+                    <SelectItem value="BP">BPのみ</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex items-center space-x-2">
                 <Switch
                   id="publish"
@@ -215,6 +249,7 @@ export default function AnnouncementsPage() {
                   setTitle("");
                   setContent("");
                   setIsPublished(false);
+                  setTargetAudience("ALL");
                 }}
               >
                 キャンセル
@@ -236,7 +271,18 @@ export default function AnnouncementsPage() {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle>{announcement.title}</CardTitle>
+                  <div className="flex items-center gap-2 mb-2">
+                    <CardTitle>{announcement.title}</CardTitle>
+                    <Badge 
+                      variant={
+                        announcement.target_audience === 'ALL' ? 'default' :
+                        announcement.target_audience === 'EMPLOYEE' ? 'secondary' : 'outline'
+                      }
+                    >
+                      {announcement.target_audience === 'ALL' ? '全員' :
+                       announcement.target_audience === 'EMPLOYEE' ? '社員' : 'BP'}
+                    </Badge>
+                  </div>
                   <CardDescription>
                     作成日:{" "}
                     {format(new Date(announcement.created_at), "yyyy年MM月dd日 HH:mm", {

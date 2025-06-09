@@ -14,6 +14,15 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { UserType } from "@/lib/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 const supabase = createClient();
 
@@ -23,6 +32,7 @@ type User = {
   department: string;
   position: string;
   email: string;
+  user_type: UserType;
   created_at: string;
 };
 
@@ -38,6 +48,7 @@ export default function UsersPage() {
     department: "",
     position: "",
     email: "",
+    user_type: "EMPLOYEE" as UserType,
   });
 
   useEffect(() => {
@@ -82,7 +93,7 @@ export default function UsersPage() {
 
       alert(`ユーザーを作成しました。初期パスワード: ${data.initialPassword}`);
       setIsCreateDialogOpen(false);
-      setFormData({ name: "", department: "", position: "", email: "" });
+      setFormData({ name: "", department: "", position: "", email: "", user_type: "EMPLOYEE" });
       fetchUsers();
     } catch (error) {
       console.error("Error creating user:", error);
@@ -116,6 +127,7 @@ export default function UsersPage() {
           name: formData.name,
           department: formData.department,
           position: formData.position,
+          user_type: formData.user_type,
         }),
       });
 
@@ -128,7 +140,7 @@ export default function UsersPage() {
       alert("ユーザー情報を更新しました");
       setIsEditDialogOpen(false);
       setSelectedUser(null);
-      setFormData({ name: "", department: "", position: "", email: "" });
+      setFormData({ name: "", department: "", position: "", email: "", user_type: "EMPLOYEE" });
       fetchUsers();
     } catch (error) {
       console.error("Error updating user:", error);
@@ -187,6 +199,7 @@ export default function UsersPage() {
       department: user.department,
       position: user.position,
       email: user.email,
+      user_type: user.user_type,
     });
     setIsEditDialogOpen(true);
   };
@@ -249,9 +262,27 @@ export default function UsersPage() {
                   disabled={isLoading}
                 />
               </div>
+              <div>
+                <Label htmlFor="user_type">ユーザー種別</Label>
+                <Select
+                  value={formData.user_type}
+                  onValueChange={(value: UserType) =>
+                    setFormData({ ...formData, user_type: value })
+                  }
+                  disabled={isLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="ユーザー種別を選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EMPLOYEE">社員</SelectItem>
+                    <SelectItem value="BP">BP</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button
                 onClick={handleCreate}
-                disabled={isLoading || !formData.name || !formData.department || !formData.position || !formData.email}
+                disabled={isLoading || !formData.name || !formData.department || !formData.position || !formData.email || !formData.user_type}
                 className="w-full"
               >
                 {isLoading ? "作成中..." : "作成"}
@@ -278,6 +309,9 @@ export default function UsersPage() {
                 メールアドレス
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                種別
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 作成日
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -292,6 +326,11 @@ export default function UsersPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-foreground">{user.department}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-foreground">{user.position}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-foreground">{user.email}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <Badge variant={user.user_type === 'EMPLOYEE' ? 'default' : 'secondary'}>
+                    {user.user_type === 'EMPLOYEE' ? '社員' : 'BP'}
+                  </Badge>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-foreground">
                   {new Date(user.created_at).toLocaleDateString()}
                 </td>
@@ -367,9 +406,27 @@ export default function UsersPage() {
                 disabled
               />
             </div>
+            <div>
+              <Label htmlFor="edit-user_type">ユーザー種別</Label>
+              <Select
+                value={formData.user_type}
+                onValueChange={(value: UserType) =>
+                  setFormData({ ...formData, user_type: value })
+                }
+                disabled={isLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="ユーザー種別を選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EMPLOYEE">社員</SelectItem>
+                  <SelectItem value="BP">BP</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button
               onClick={handleUpdate}
-              disabled={isLoading || !formData.name || !formData.department || !formData.position}
+              disabled={isLoading || !formData.name || !formData.department || !formData.position || !formData.user_type}
               className="w-full"
             >
               {isLoading ? "更新中..." : "更新"}

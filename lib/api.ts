@@ -11,7 +11,19 @@ export async function getAnnouncements(): Promise<(Announcement & { is_read: boo
     throw new Error("認証が必要です");
   }
 
-  // Get announcements with read status
+  // Get current user's profile to determine user_type
+  const { data: userProfile, error: userError } = await supabase
+    .from("users")
+    .select("user_type")
+    .eq("id", user.id)
+    .single();
+
+  if (userError) {
+    console.error("Error fetching user profile:", userError);
+    throw userError;
+  }
+
+  // Get announcements with read status, filtered by target audience
   const { data, error } = await supabase
     .from("announcements")
     .select(`
@@ -20,6 +32,7 @@ export async function getAnnouncements(): Promise<(Announcement & { is_read: boo
     `)
     .eq("is_published", true)
     .eq("announcement_reads.user_id", user.id)
+    .or(`target_audience.eq.ALL,target_audience.eq.${userProfile.user_type}`)
     .order("created_at", { ascending: false })
     .limit(3);
 

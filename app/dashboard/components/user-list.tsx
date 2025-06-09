@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { User } from '@/lib/types';
 import { Mail } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 type UserListProps = {
   initialUsers: User[];
@@ -61,7 +62,12 @@ export function UserList({ initialUsers, hasMore: initialHasMore }: UserListProp
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-semibold">{user.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold">{user.name}</h3>
+                    <Badge variant={user.user_type === 'EMPLOYEE' ? 'default' : 'secondary'} className="text-xs">
+                      {user.user_type === 'EMPLOYEE' ? '社員' : 'BP'}
+                    </Badge>
+                  </div>
                   <p className="text-sm text-muted-foreground">{user.position}</p>
                 </div>
               </div>

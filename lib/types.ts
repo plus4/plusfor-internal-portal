@@ -1,4 +1,5 @@
 export type UserType = 'EMPLOYEE' | 'BP';
+export type UserRole = 'ADMIN' | 'USER';
 export type TargetAudience = 'EMPLOYEE' | 'BP' | 'ALL';
 
 export type Announcement = {
@@ -18,6 +19,7 @@ export type User = {
   position: string;
   email: string;
   user_type: UserType;
+  role: UserRole;
   created_at: string;
   updated_at: string;
 }; 

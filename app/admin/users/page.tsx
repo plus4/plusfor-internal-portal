@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { UserType } from "@/lib/types";
+import { UserType, UserRole } from "@/lib/types";
 import {
   Select,
   SelectContent,
@@ -33,6 +33,7 @@ type User = {
   position: string;
   email: string;
   user_type: UserType;
+  role: UserRole;
   created_at: string;
 };
 
@@ -49,6 +50,7 @@ export default function UsersPage() {
     position: "",
     email: "",
     user_type: "EMPLOYEE" as UserType,
+    role: "USER" as UserRole,
   });
 
   useEffect(() => {
@@ -93,7 +95,7 @@ export default function UsersPage() {
 
       alert(`ユーザーを作成しました。初期パスワード: ${data.initialPassword}`);
       setIsCreateDialogOpen(false);
-      setFormData({ name: "", department: "", position: "", email: "", user_type: "EMPLOYEE" });
+      setFormData({ name: "", department: "", position: "", email: "", user_type: "EMPLOYEE", role: "USER" });
       fetchUsers();
     } catch (error) {
       console.error("Error creating user:", error);
@@ -128,6 +130,7 @@ export default function UsersPage() {
           department: formData.department,
           position: formData.position,
           user_type: formData.user_type,
+          role: formData.role,
         }),
       });
 
@@ -140,7 +143,7 @@ export default function UsersPage() {
       alert("ユーザー情報を更新しました");
       setIsEditDialogOpen(false);
       setSelectedUser(null);
-      setFormData({ name: "", department: "", position: "", email: "", user_type: "EMPLOYEE" });
+      setFormData({ name: "", department: "", position: "", email: "", user_type: "EMPLOYEE", role: "USER" });
       fetchUsers();
     } catch (error) {
       console.error("Error updating user:", error);
@@ -200,6 +203,7 @@ export default function UsersPage() {
       position: user.position,
       email: user.email,
       user_type: user.user_type,
+      role: user.role,
     });
     setIsEditDialogOpen(true);
   };
@@ -280,9 +284,27 @@ export default function UsersPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div>
+                <Label htmlFor="role">ロール</Label>
+                <Select
+                  value={formData.role}
+                  onValueChange={(value: UserRole) =>
+                    setFormData({ ...formData, role: value })
+                  }
+                  disabled={isLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="ロールを選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USER">一般ユーザー</SelectItem>
+                    <SelectItem value="ADMIN">管理者</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button
                 onClick={handleCreate}
-                disabled={isLoading || !formData.name || !formData.department || !formData.position || !formData.email || !formData.user_type}
+                disabled={isLoading || !formData.name || !formData.department || !formData.position || !formData.email || !formData.user_type || !formData.role}
                 className="w-full"
               >
                 {isLoading ? "作成中..." : "作成"}
@@ -312,6 +334,9 @@ export default function UsersPage() {
                 種別
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                ロール
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 作成日
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -329,6 +354,11 @@ export default function UsersPage() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <Badge variant={user.user_type === 'EMPLOYEE' ? 'default' : 'secondary'}>
                     {user.user_type === 'EMPLOYEE' ? '社員' : 'BP'}
+                  </Badge>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <Badge variant={user.role === 'ADMIN' ? 'destructive' : 'outline'}>
+                    {user.role === 'ADMIN' ? '管理者' : '一般ユーザー'}
                   </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-foreground">
@@ -424,9 +454,27 @@ export default function UsersPage() {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <Label htmlFor="edit-role">ロール</Label>
+              <Select
+                value={formData.role}
+                onValueChange={(value: UserRole) =>
+                  setFormData({ ...formData, role: value })
+                }
+                disabled={isLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="ロールを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USER">一般ユーザー</SelectItem>
+                  <SelectItem value="ADMIN">管理者</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button
               onClick={handleUpdate}
-              disabled={isLoading || !formData.name || !formData.department || !formData.position || !formData.user_type}
+              disabled={isLoading || !formData.name || !formData.department || !formData.position || !formData.user_type || !formData.role}
               className="w-full"
             >
               {isLoading ? "更新中..." : "更新"}

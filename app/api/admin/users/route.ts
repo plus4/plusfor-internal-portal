@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { requireAdmin } from "@/lib/auth";
 
 // 環境変数のチェック
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -74,6 +75,19 @@ export async function POST(request: Request) {
   try {
     console.log("=== ユーザー登録処理開始 ===");
     
+    // 管理者権限チェック
+    console.log("管理者権限チェック開始");
+    try {
+      await requireAdmin();
+      console.log("管理者権限チェック成功");
+    } catch (error) {
+      console.log("管理者権限チェック失敗:", error);
+      return NextResponse.json(
+        { error: "管理者権限が必要です" },
+        { status: 403 }
+      );
+    }
+
     // 認証チェック
     console.log("認証チェック開始");
     const authCheckResult = await checkAuth();
@@ -97,12 +111,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, department, position, email, user_type } = body;
+    const { name, department, position, email, user_type, role } = body;
 
     // 必須項目のチェック
     console.log("必須項目のチェック開始");
-    if (!name || !department || !position || !email || !user_type) {
-      console.log("必須項目が不足:", { name, department, position, email, user_type });
+    if (!name || !department || !position || !email || !user_type || !role) {
+      console.log("必須項目が不足:", { name, department, position, email, user_type, role });
       return NextResponse.json(
         { error: "必須項目が入力されていません" },
         { status: 400 }
@@ -122,6 +136,7 @@ export async function POST(request: Request) {
         department,
         position,
         user_type,
+        role,
       },
     });
 
@@ -189,6 +204,7 @@ export async function POST(request: Request) {
         position,
         email,
         user_type,
+        role,
       },
     });
   } catch (error) {
@@ -204,6 +220,19 @@ export async function PUT(request: Request) {
   try {
     console.log("=== ユーザー更新処理開始 ===");
     
+    // 管理者権限チェック
+    console.log("管理者権限チェック開始");
+    try {
+      await requireAdmin();
+      console.log("管理者権限チェック成功");
+    } catch (error) {
+      console.log("管理者権限チェック失敗:", error);
+      return NextResponse.json(
+        { error: "管理者権限が必要です" },
+        { status: 403 }
+      );
+    }
+
     // 認証チェック
     console.log("認証チェック開始");
     const authCheckResult = await checkAuth();
@@ -227,12 +256,12 @@ export async function PUT(request: Request) {
       );
     }
 
-    const { id, name, department, position, user_type } = body;
+    const { id, name, department, position, user_type, role } = body;
 
     // 必須項目のチェック
     console.log("必須項目のチェック開始");
-    if (!id || !name || !department || !position || !user_type) {
-      console.log("必須項目が不足:", { id, name, department, position, user_type });
+    if (!id || !name || !department || !position || !user_type || !role) {
+      console.log("必須項目が不足:", { id, name, department, position, user_type, role });
       return NextResponse.json(
         { error: "必須項目が入力されていません" },
         { status: 400 }
@@ -249,6 +278,7 @@ export async function PUT(request: Request) {
         department,
         position,
         user_type,
+        role,
       })
       .eq("id", id);
 
@@ -270,6 +300,7 @@ export async function PUT(request: Request) {
         department,
         position,
         user_type,
+        role,
       },
     });
   } catch (error) {
@@ -284,6 +315,19 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   try {
     console.log("=== ユーザー削除処理開始 ===");
+    
+    // 管理者権限チェック
+    console.log("管理者権限チェック開始");
+    try {
+      await requireAdmin();
+      console.log("管理者権限チェック成功");
+    } catch (error) {
+      console.log("管理者権限チェック失敗:", error);
+      return NextResponse.json(
+        { error: "管理者権限が必要です" },
+        { status: 403 }
+      );
+    }
     
     // 認証チェック
     const authCheckResult = await checkAuth();

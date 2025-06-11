@@ -29,7 +29,6 @@ export function Sidebar({ isAdmin }: SidebarProps) {
   return (
     <aside className="w-64 bg-background border-r border-border">
       <div className="p-4">
-        <h1 className="text-xl font-bold mb-8">ダッシュボード</h1>
         <nav className="space-y-2">
           <Link 
             href="/dashboard" 

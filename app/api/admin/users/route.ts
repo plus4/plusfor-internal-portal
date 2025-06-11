@@ -1,6 +1,29 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { requireAdmin } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+
+// データ取得とロジックを統合
+async function requireAdmin(): Promise<void> {
+  const supabase = await createClient();
+  
+  // Get current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    throw new Error('管理者権限が必要です');
+  }
+
+  // Get user profile with role
+  const { data: profile, error: profileError } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError || !profile || profile.role !== 'ADMIN') {
+    throw new Error('管理者権限が必要です');
+  }
+}
 
 
 // GET - ユーザー一覧取得

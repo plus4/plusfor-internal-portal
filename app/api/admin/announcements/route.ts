@@ -2,25 +2,38 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { TargetAudience } from "@/lib/types";
 
+// データ取得とロジックを統合
+async function requireAdmin(): Promise<void> {
+  const supabase = await createClient();
+  
+  // Get current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    throw new Error('管理者権限が必要です');
+  }
+
+  // Get user profile with role
+  const { data: profile, error: profileError } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError || !profile || profile.role !== 'ADMIN') {
+    throw new Error('管理者権限が必要です');
+  }
+}
+
 // GET - お知らせ一覧取得
 export async function GET() {
   try {
     const supabase = await createClient();
 
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
@@ -53,20 +66,10 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
@@ -125,20 +128,10 @@ export async function PUT(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
@@ -201,20 +194,10 @@ export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
@@ -254,20 +237,10 @@ export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 

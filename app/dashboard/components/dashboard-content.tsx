@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Announcement, User } from "@/lib/types";
-import { UserList } from "./user-list";
+import { MembersList } from "./members-list";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -76,16 +76,22 @@ export function DashboardContent({
               ホーム
             </Link>
             <Link 
-              href="/dashboard/announcements" 
+              href="/announcements" 
               className="block px-4 py-2 rounded-lg hover:bg-accent"
             >
               お知らせ
             </Link>
             <Link 
-              href="/dashboard/employees" 
+              href="/members" 
               className="block px-4 py-2 rounded-lg hover:bg-accent"
             >
-              社員一覧
+              メンバー一覧
+            </Link>
+            <Link 
+              href="/profile" 
+              className="block px-4 py-2 rounded-lg hover:bg-accent"
+            >
+              プロフィール
             </Link>
           </nav>
         </div>
@@ -99,7 +105,7 @@ export function DashboardContent({
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">お知らせ</h2>
               <Link 
-                href="/dashboard/announcements" 
+                href="/announcements" 
                 className="text-sm text-primary hover:underline"
               >
                 すべて見る
@@ -134,13 +140,13 @@ export function DashboardContent({
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">社員一覧</h2>
               <Link 
-                href="/dashboard/employees" 
+                href="/members" 
                 className="text-sm text-primary hover:underline"
               >
                 すべて見る
               </Link>
             </div>
-            <UserList 
+            <MembersList 
               initialUsers={users} 
               hasMore={hasMoreUsers} 
             />

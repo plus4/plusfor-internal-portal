@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -54,23 +53,23 @@ export default function AnnouncementsPage() {
   const [content, setContent] = useState("");
   const [isPublished, setIsPublished] = useState(false);
   const [targetAudience, setTargetAudience] = useState<TargetAudience>("ALL");
-  const supabase = createClient();
 
   const fetchAnnouncements = useCallback(async () => {
-    const { data, error } = await supabase
-      .from("announcements")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
+    try {
+      const response = await fetch("/api/admin/announcements");
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "お知らせ一覧の取得に失敗しました");
+      }
+      
+      const data = await response.json();
+      setAnnouncements(data || []);
+    } catch (error) {
       console.error("Error fetching announcements:", error);
-      return;
+      alert(error instanceof Error ? error.message : "お知らせ一覧の取得に失敗しました");
     }
-
-    if (data) {
-      setAnnouncements(data);
-    }
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     fetchAnnouncements();
@@ -78,19 +77,22 @@ export default function AnnouncementsPage() {
 
   const handleCreate = async () => {
     try {
-      const { error } = await supabase.from("announcements").insert([
-        {
+      const response = await fetch("/api/admin/announcements", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           title,
           content,
           is_published: isPublished,
           target_audience: targetAudience,
-        },
-      ]).select();
+        }),
+      });
 
-      if (error) {
-        console.error("Error creating announcement:", error);
-        alert(`お知らせの作成に失敗しました: ${error.message}`);
-        return;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "お知らせの作成に失敗しました");
       }
 
       setTitle("");
@@ -99,51 +101,66 @@ export default function AnnouncementsPage() {
       setTargetAudience("ALL");
       setIsDialogOpen(false);
       fetchAnnouncements();
-    } catch (err) {
-      console.error("Unexpected error creating announcement:", err);
-      alert("予期せぬエラーが発生しました。もう一度お試しください。");
+    } catch (error) {
+      console.error("Error creating announcement:", error);
+      alert(error instanceof Error ? error.message : "お知らせの作成に失敗しました");
     }
   };
 
   const handleUpdate = async () => {
     if (!editingAnnouncement) return;
 
-    const { error } = await supabase
-      .from("announcements")
-      .update({
-        title,
-        content,
-        is_published: isPublished,
-        target_audience: targetAudience,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", editingAnnouncement.id);
+    try {
+      const response = await fetch("/api/admin/announcements", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingAnnouncement.id,
+          title,
+          content,
+          is_published: isPublished,
+          target_audience: targetAudience,
+        }),
+      });
 
-    if (error) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "お知らせの更新に失敗しました");
+      }
+
+      setTitle("");
+      setContent("");
+      setIsPublished(false);
+      setTargetAudience("ALL");
+      setEditingAnnouncement(null);
+      setIsDialogOpen(false);
+      fetchAnnouncements();
+    } catch (error) {
       console.error("Error updating announcement:", error);
-      return;
+      alert(error instanceof Error ? error.message : "お知らせの更新に失敗しました");
     }
-
-    setTitle("");
-    setContent("");
-    setIsPublished(false);
-    setTargetAudience("ALL");
-    setEditingAnnouncement(null);
-    setIsDialogOpen(false);
-    fetchAnnouncements();
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("このお知らせを削除してもよろしいですか？")) return;
 
-    const { error } = await supabase.from("announcements").delete().eq("id", id);
+    try {
+      const response = await fetch(`/api/admin/announcements?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
 
-    if (error) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "お知らせの削除に失敗しました");
+      }
+
+      fetchAnnouncements();
+    } catch (error) {
       console.error("Error deleting announcement:", error);
-      return;
+      alert(error instanceof Error ? error.message : "お知らせの削除に失敗しました");
     }
-
-    fetchAnnouncements();
   };
 
   const handleEdit = (announcement: Announcement) => {
@@ -156,20 +173,28 @@ export default function AnnouncementsPage() {
   };
 
   const handleTogglePublish = async (announcement: Announcement) => {
-    const { error } = await supabase
-      .from("announcements")
-      .update({
-        is_published: !announcement.is_published,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", announcement.id);
+    try {
+      const response = await fetch("/api/admin/announcements", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: announcement.id,
+          is_published: !announcement.is_published,
+        }),
+      });
 
-    if (error) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "公開状態の変更に失敗しました");
+      }
+
+      fetchAnnouncements();
+    } catch (error) {
       console.error("Error toggling announcement publish status:", error);
-      return;
+      alert(error instanceof Error ? error.message : "公開状態の変更に失敗しました");
     }
-
-    fetchAnnouncements();
   };
 
   return (

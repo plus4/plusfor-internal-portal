@@ -6,24 +6,16 @@ import { User } from "@/lib/types";
 async function getMembers(options?: {
   page?: number;
   pageSize?: number;
-  sortBy?: 'created_at' | 'department';
 }): Promise<{
   data: User[];
   hasMore: boolean;
 }> {
   const supabase = await createClient();
-  const { page, pageSize, sortBy = 'department' } = options || {};
+  const { page, pageSize } = options || {};
   
-  let query = supabase.from("users").select("*");
-  
-  // ソート順設定
-  if (sortBy === 'department') {
-    query = query
-      .order("department", { ascending: true })
-      .order("name", { ascending: true });
-  } else {
-    query = query.order("created_at", { ascending: true });
-  }
+  let query = supabase.from("users").select("*")
+    .order("department", { ascending: true })
+    .order("name", { ascending: true });
   
   // ページネーション設定（指定がある場合のみ）
   if (page && pageSize) {
@@ -58,9 +50,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const pageSize = parseInt(searchParams.get("pageSize") || "6");
-    const sortBy = (searchParams.get("sortBy") || "department") as 'created_at' | 'department';
 
-    const result = await getMembers({ page, pageSize, sortBy });
+    const result = await getMembers({ page, pageSize });
     
     return NextResponse.json(result);
   } catch (error) {
@@ -71,3 +62,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

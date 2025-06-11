@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { Header } from "@/components/header";
+import { Sidebar } from "@/components/sidebar";
 import { createClient } from '@/lib/supabase/server';
 
 // データ取得とロジックを統合
@@ -44,9 +45,14 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main>{children}</main>
+    <div className="flex h-screen">
+      <div className="flex-1 flex flex-col">
+        <Header />
+        <div className="flex flex-1">
+          <Sidebar isAdmin={true} />
+          <main className="flex-1">{children}</main>
+        </div>
+      </div>
     </div>
   );
 }

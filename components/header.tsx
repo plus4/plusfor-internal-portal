@@ -34,15 +34,19 @@ export function Header() {
       setUser(user);
 
       if (user) {
-        // ユーザーIDを使用してユーザー情報を取得
-        const { data: userData, error } = await supabase
-          .from('users')
-          .select('name, department, position')
-          .eq('id', user.id)
-          .single();
-
-        if (!error && userData) {
-          setUserInfo(userData);
+        // ユーザー情報をAPI経由で取得
+        try {
+          const response = await fetch('/api/user/profile');
+          if (response.ok) {
+            const userData = await response.json();
+            setUserInfo({
+              name: userData.name,
+              department: userData.department,
+              position: userData.position
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
         }
       }
     };

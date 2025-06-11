@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,8 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-
-const supabase = createClient();
 
 type User = {
   id: string;
@@ -53,27 +50,37 @@ export default function UsersPage() {
     role: "USER" as UserRole,
   });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
+      const response = await fetch("/api/admin/users");
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "ユーザー一覧の取得に失敗しました");
+      }
+      
+      const data = await response.json();
       setUsers(data || []);
     } catch (error) {
       console.error("Error fetching users:", error);
-      alert("ユーザー一覧の取得に失敗しました");
+      if (error instanceof Error) {
+        if (error.message.includes("認証が必要です")) {
+          router.push("/auth/login");
+        } else {
+          alert(error.message);
+        }
+      } else {
+        alert("ユーザー一覧の取得に失敗しました");
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleCreate = async () => {
     try {

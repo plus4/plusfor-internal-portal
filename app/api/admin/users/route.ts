@@ -71,6 +71,60 @@ async function checkAuth() {
   }
 }
 
+// GET - ユーザー一覧取得
+export async function GET() {
+  try {
+    console.log("=== ユーザー一覧取得処理開始 ===");
+    
+    // 管理者権限チェック
+    console.log("管理者権限チェック開始");
+    try {
+      await requireAdmin();
+      console.log("管理者権限チェック成功");
+    } catch (error) {
+      console.log("管理者権限チェック失敗:", error);
+      return NextResponse.json(
+        { error: "管理者権限が必要です" },
+        { status: 403 }
+      );
+    }
+
+    // 認証チェック
+    console.log("認証チェック開始");
+    const authCheckResult = await checkAuth();
+    if (authCheckResult) {
+      console.log("認証チェック失敗:", authCheckResult);
+      return authCheckResult;
+    }
+    console.log("認証チェック成功");
+
+    // ユーザー一覧取得
+    console.log("ユーザー一覧取得開始");
+    const { data, error } = await supabaseAdmin
+      .from("users")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("ユーザー一覧取得エラー:", error);
+      return NextResponse.json(
+        { error: "ユーザー一覧の取得に失敗しました" },
+        { status: 500 }
+      );
+    }
+
+    console.log("ユーザー一覧取得成功");
+    console.log("=== ユーザー一覧取得処理完了 ===");
+    return NextResponse.json(data || []);
+  } catch (error) {
+    console.error("予期せぬエラー:", error);
+    return NextResponse.json(
+      { error: "予期せぬエラーが発生しました" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     console.log("=== ユーザー登録処理開始 ===");

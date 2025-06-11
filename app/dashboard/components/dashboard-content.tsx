@@ -129,7 +129,7 @@ export function DashboardContent({
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">お知らせ</h2>
               <Link 
-                href="/dashboard/announcements" 
+                href="/announcements" 
                 className="text-sm text-primary hover:underline"
               >
                 すべて見る
@@ -159,12 +159,12 @@ export function DashboardContent({
             </div>
           </section>
 
-          {/* 社員一覧セクション */}
+          {/* メンバー一覧セクション */}
           <section>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">社員一覧</h2>
+              <h2 className="text-2xl font-bold">メンバー一覧</h2>
               <Link 
-                href="/dashboard/employees" 
+                href="/members" 
                 className="text-sm text-primary hover:underline"
               >
                 すべて見る

@@ -13,14 +13,12 @@ type DashboardContentProps = {
   announcements: (Announcement & { is_read: boolean })[];
   users: User[];
   hasMoreUsers: boolean;
-  isAdmin: boolean;
 };
 
 export function DashboardContent({
   announcements,
   users,
-  hasMoreUsers,
-  isAdmin
+  hasMoreUsers
 }: DashboardContentProps) {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<(Announcement & { is_read: boolean }) | null>(null);
   const [announcementList, setAnnouncementList] = useState(announcements);
@@ -67,7 +65,7 @@ export function DashboardContent({
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar isAdmin={isAdmin} />
+      <Sidebar />
 
       {/* Main Content */}
       <main className="flex-1 p-8">

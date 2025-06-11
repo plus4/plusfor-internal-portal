@@ -2,13 +2,30 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
 
-type SidebarProps = {
-  isAdmin: boolean;
-};
-
-export function Sidebar({ isAdmin }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        setIsAdmin(profile?.role === 'ADMIN');
+      }
+    };
+
+    checkAdminStatus();
+  }, [supabase]);
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {

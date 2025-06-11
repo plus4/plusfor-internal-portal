@@ -75,13 +75,12 @@ async function getDashboardData() {
     users: {
       data: usersData || [],
       hasMore: hasMoreUsers
-    },
-    isAdmin: userProfile.role === 'ADMIN'
+    }
   };
 }
 
 export default async function DashboardPage() {
-  const { announcements, users, isAdmin } = await getDashboardData();
+  const { announcements, users } = await getDashboardData();
 
   return (
     <div className="flex h-screen">
@@ -91,7 +90,6 @@ export default async function DashboardPage() {
           announcements={announcements}
           users={users.data}
           hasMoreUsers={users.hasMore}
-          isAdmin={isAdmin}
         />
       </div>
     </div>

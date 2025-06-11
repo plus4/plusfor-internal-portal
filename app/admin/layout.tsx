@@ -49,7 +49,7 @@ export default async function AdminLayout({
       <div className="flex-1 flex flex-col">
         <Header />
         <div className="flex flex-1">
-          <Sidebar isAdmin={true} />
+          <Sidebar />
           <main className="flex-1">{children}</main>
         </div>
       </div>

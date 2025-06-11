@@ -126,7 +126,7 @@ export default function UsersPage() {
     try {
       setIsLoading(true);
 
-      const response = await fetch("/api/admin/users", {
+      const response = await fetch("/api/admin/members", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

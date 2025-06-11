@@ -13,10 +13,10 @@ async function getDashboardData() {
     throw new Error("認証が必要です");
   }
 
-  // Get current user's profile to determine user_type
+  // Get current user's profile to determine user_type and role
   const { data: userProfile, error: userError } = await supabase
     .from("users")
-    .select("user_type")
+    .select("user_type, role")
     .eq("id", user.id)
     .single();
 
@@ -75,12 +75,13 @@ async function getDashboardData() {
     users: {
       data: usersData || [],
       hasMore: hasMoreUsers
-    }
+    },
+    isAdmin: userProfile.role === 'ADMIN'
   };
 }
 
 export default async function DashboardPage() {
-  const { announcements, users } = await getDashboardData();
+  const { announcements, users, isAdmin } = await getDashboardData();
 
   return (
     <div className="flex h-screen">
@@ -90,6 +91,7 @@ export default async function DashboardPage() {
           announcements={announcements}
           users={users.data}
           hasMoreUsers={users.hasMore}
+          isAdmin={isAdmin}
         />
       </div>
     </div>

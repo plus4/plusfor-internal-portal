@@ -53,7 +53,7 @@ export default function UsersPage() {
   const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/admin/users");
+      const response = await fetch("/api/admin/members");
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -86,7 +86,7 @@ export default function UsersPage() {
     try {
       setIsLoading(true);
 
-      const response = await fetch("/api/admin/users", {
+      const response = await fetch("/api/admin/members", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,7 +126,7 @@ export default function UsersPage() {
     try {
       setIsLoading(true);
 
-      const response = await fetch("/api/admin/users", {
+      const response = await fetch("/api/admin/members", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -174,7 +174,7 @@ export default function UsersPage() {
     try {
       setIsLoading(true);
 
-      const response = await fetch(`/api/admin/users?id=${encodeURIComponent(userId)}`, {
+      const response = await fetch(`/api/admin/members?id=${encodeURIComponent(userId)}`, {
         method: "DELETE",
       });
 
@@ -492,3 +492,4 @@ export default function UsersPage() {
     </div>
   );
 } 
+

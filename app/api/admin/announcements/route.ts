@@ -1,31 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { TargetAudience } from "@/lib/types";
+
+// データ取得とロジックを統合
+async function requireAdmin(): Promise<void> {
+  const supabase = await createClient();
+  
+  // Get current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    throw new Error('管理者権限が必要です');
+  }
+
+  // Get user profile with role
+  const { data: profile, error: profileError } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError || !profile || profile.role !== 'ADMIN') {
+    throw new Error('管理者権限が必要です');
+  }
+}
 
 // GET - お知らせ一覧取得
 export async function GET() {
   try {
-    const supabase = await createClient();
-
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
-    // お知らせ一覧取得
-    const { data, error } = await supabase
+    // お知らせ一覧取得（管理者権限でRLSをバイパス）
+    const { data, error } = await supabaseAdmin
       .from("announcements")
       .select("*")
       .order("created_at", { ascending: false });
@@ -51,22 +63,10 @@ export async function GET() {
 // POST - お知らせ作成
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
@@ -88,8 +88,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // お知らせ作成
-    const { data, error } = await supabase
+    // お知らせ作成（管理者権限でRLSをバイパス）
+    const { data, error } = await supabaseAdmin
       .from("announcements")
       .insert([
         {
@@ -123,22 +123,10 @@ export async function POST(request: NextRequest) {
 // PUT - お知らせ更新
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
@@ -164,8 +152,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // お知らせ更新
-    const { data, error } = await supabase
+    // お知らせ更新（管理者権限でRLSをバイパス）
+    const { data, error } = await supabaseAdmin
       .from("announcements")
       .update({
         title,
@@ -199,22 +187,10 @@ export async function PUT(request: NextRequest) {
 // DELETE - お知らせ削除
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
@@ -225,8 +201,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "IDが必要です" }, { status: 400 });
     }
 
-    // お知らせ削除
-    const { error } = await supabase
+    // お知らせ削除（管理者権限でRLSをバイパス）
+    const { error } = await supabaseAdmin
       .from("announcements")
       .delete()
       .eq("id", id);
@@ -252,22 +228,10 @@ export async function DELETE(request: NextRequest) {
 // PATCH - 公開状態切り替え
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 認証チェック
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
-    }
-
-    // 管理者権限チェック
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (userError || !userData || userData.role !== "ADMIN") {
+    // 認証・管理者権限チェック
+    try {
+      await requireAdmin();
+    } catch {
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
 
@@ -278,8 +242,8 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "IDが必要です" }, { status: 400 });
     }
 
-    // 公開状態更新
-    const { data, error } = await supabase
+    // 公開状態更新（管理者権限でRLSをバイパス）
+    const { data, error } = await supabaseAdmin
       .from("announcements")
       .update({
         is_published: Boolean(is_published),
@@ -306,3 +270,4 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+

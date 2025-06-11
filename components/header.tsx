@@ -36,7 +36,7 @@ export function Header() {
       if (user) {
         // ユーザー情報をAPI経由で取得
         try {
-          const response = await fetch('/api/user/profile');
+          const response = await fetch('/api/profile');
           if (response.ok) {
             const userData = await response.json();
             setUserInfo({

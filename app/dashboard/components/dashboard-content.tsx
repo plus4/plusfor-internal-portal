@@ -12,12 +12,14 @@ type DashboardContentProps = {
   announcements: (Announcement & { is_read: boolean })[];
   users: User[];
   hasMoreUsers: boolean;
+  isAdmin: boolean;
 };
 
 export function DashboardContent({
   announcements,
   users,
-  hasMoreUsers
+  hasMoreUsers,
+  isAdmin
 }: DashboardContentProps) {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<(Announcement & { is_read: boolean }) | null>(null);
   const [announcementList, setAnnouncementList] = useState(announcements);
@@ -76,17 +78,45 @@ export function DashboardContent({
               ホーム
             </Link>
             <Link 
-              href="/dashboard/announcements" 
+              href="/announcements" 
               className="block px-4 py-2 rounded-lg hover:bg-accent"
             >
               お知らせ
             </Link>
             <Link 
-              href="/dashboard/employees" 
+              href="/members" 
               className="block px-4 py-2 rounded-lg hover:bg-accent"
             >
-              社員一覧
+              メンバー一覧
             </Link>
+            <Link 
+              href="/profile" 
+              className="block px-4 py-2 rounded-lg hover:bg-accent"
+            >
+              プロフィール
+            </Link>
+            
+            {/* 管理者のみ表示 */}
+            {isAdmin && (
+              <>
+                <div className="border-t border-border my-4"></div>
+                <div className="px-4 py-2 text-sm font-medium text-muted-foreground">
+                  管理機能
+                </div>
+                <Link 
+                  href="/admin/announcements" 
+                  className="block px-4 py-2 rounded-lg hover:bg-accent text-sm"
+                >
+                  お知らせ管理
+                </Link>
+                <Link 
+                  href="/admin/members" 
+                  className="block px-4 py-2 rounded-lg hover:bg-accent text-sm"
+                >
+                  メンバー管理
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </aside>
@@ -99,7 +129,7 @@ export function DashboardContent({
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">お知らせ</h2>
               <Link 
-                href="/dashboard/announcements" 
+                href="/announcements" 
                 className="text-sm text-primary hover:underline"
               >
                 すべて見る
@@ -129,12 +159,12 @@ export function DashboardContent({
             </div>
           </section>
 
-          {/* 社員一覧セクション */}
+          {/* メンバー一覧セクション */}
           <section>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">社員一覧</h2>
+              <h2 className="text-2xl font-bold">メンバー一覧</h2>
               <Link 
-                href="/dashboard/employees" 
+                href="/members" 
                 className="text-sm text-primary hover:underline"
               >
                 すべて見る
@@ -183,3 +213,4 @@ export function DashboardContent({
     </div>
   );
 } 
+

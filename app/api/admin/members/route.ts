@@ -1,6 +1,29 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { requireAdmin } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+
+// データ取得とロジックを統合
+async function requireAdmin(): Promise<void> {
+  const supabase = await createClient();
+  
+  // Get current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    throw new Error('管理者権限が必要です');
+  }
+
+  // Get user profile with role
+  const { data: profile, error: profileError } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError || !profile || profile.role !== 'ADMIN') {
+    throw new Error('管理者権限が必要です');
+  }
+}
 
 
 // GET - ユーザー一覧取得
@@ -13,8 +36,8 @@ export async function GET() {
     try {
       await requireAdmin();
       console.log("認証・管理者権限チェック成功");
-    } catch (error) {
-      console.log("認証・管理者権限チェック失敗:", error);
+    } catch {
+      console.log("認証・管理者権限チェック失敗");
       return NextResponse.json(
         { error: "管理者権限が必要です" },
         { status: 403 }
@@ -57,8 +80,8 @@ export async function POST(request: Request) {
     try {
       await requireAdmin();
       console.log("認証・管理者権限チェック成功");
-    } catch (error) {
-      console.log("認証・管理者権限チェック失敗:", error);
+    } catch {
+      console.log("認証・管理者権限チェック失敗");
       return NextResponse.json(
         { error: "管理者権限が必要です" },
         { status: 403 }
@@ -193,8 +216,8 @@ export async function PUT(request: Request) {
     try {
       await requireAdmin();
       console.log("認証・管理者権限チェック成功");
-    } catch (error) {
-      console.log("認証・管理者権限チェック失敗:", error);
+    } catch {
+      console.log("認証・管理者権限チェック失敗");
       return NextResponse.json(
         { error: "管理者権限が必要です" },
         { status: 403 }
@@ -341,3 +364,4 @@ export async function DELETE(request: Request) {
     );
   }
 } 
+

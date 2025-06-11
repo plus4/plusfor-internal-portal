@@ -1,102 +1,25 @@
-import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
 
-// 環境変数のチェック
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
-  throw new Error("Missing Supabase environment variables");
-}
-
-// 型アサーションを追加
-const supabaseUrlString = supabaseUrl as string;
-const supabaseAnonKeyString = supabaseAnonKey as string;
-
-const supabaseAdmin = createClient(supabaseUrlString, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
-
-// 認証チェック用のミドルウェア
-async function checkAuth() {
-  try {
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      supabaseUrlString,
-      supabaseAnonKeyString,
-      {
-        cookies: {
-          get: (name: string) => cookieStore.get(name)?.value,
-          set: (name: string, value: string, options: CookieOptions) => {
-            cookieStore.set({ name, value, ...options });
-          },
-          remove: (name: string, options: CookieOptions) => {
-            cookieStore.set({ name, value: "", ...options });
-          },
-        },
-      }
-    );
-
-    const { data: { session }, error } = await supabase.auth.getSession();
-
-    if (error) {
-      console.error("Auth error:", error);
-      return NextResponse.json(
-        { error: "認証エラーが発生しました" },
-        { status: 401 }
-      );
-    }
-
-    if (!session) {
-      return NextResponse.json(
-        { error: "認証が必要です" },
-        { status: 401 }
-      );
-    }
-
-    return null;
-  } catch (error) {
-    console.error("Unexpected error in checkAuth:", error);
-    return NextResponse.json(
-      { error: "予期せぬエラーが発生しました" },
-      { status: 500 }
-    );
-  }
-}
 
 // GET - ユーザー一覧取得
 export async function GET() {
   try {
     console.log("=== ユーザー一覧取得処理開始 ===");
     
-    // 管理者権限チェック
-    console.log("管理者権限チェック開始");
+    // 認証・管理者権限チェック
+    console.log("認証・管理者権限チェック開始");
     try {
       await requireAdmin();
-      console.log("管理者権限チェック成功");
+      console.log("認証・管理者権限チェック成功");
     } catch (error) {
-      console.log("管理者権限チェック失敗:", error);
+      console.log("認証・管理者権限チェック失敗:", error);
       return NextResponse.json(
         { error: "管理者権限が必要です" },
         { status: 403 }
       );
     }
-
-    // 認証チェック
-    console.log("認証チェック開始");
-    const authCheckResult = await checkAuth();
-    if (authCheckResult) {
-      console.log("認証チェック失敗:", authCheckResult);
-      return authCheckResult;
-    }
-    console.log("認証チェック成功");
 
     // ユーザー一覧取得
     console.log("ユーザー一覧取得開始");
@@ -129,27 +52,18 @@ export async function POST(request: Request) {
   try {
     console.log("=== ユーザー登録処理開始 ===");
     
-    // 管理者権限チェック
-    console.log("管理者権限チェック開始");
+    // 認証・管理者権限チェック
+    console.log("認証・管理者権限チェック開始");
     try {
       await requireAdmin();
-      console.log("管理者権限チェック成功");
+      console.log("認証・管理者権限チェック成功");
     } catch (error) {
-      console.log("管理者権限チェック失敗:", error);
+      console.log("認証・管理者権限チェック失敗:", error);
       return NextResponse.json(
         { error: "管理者権限が必要です" },
         { status: 403 }
       );
     }
-
-    // 認証チェック
-    console.log("認証チェック開始");
-    const authCheckResult = await checkAuth();
-    if (authCheckResult) {
-      console.log("認証チェック失敗:", authCheckResult);
-      return authCheckResult;
-    }
-    console.log("認証チェック成功");
 
     // リクエストボディの解析
     console.log("リクエストボディの解析開始");
@@ -274,27 +188,18 @@ export async function PUT(request: Request) {
   try {
     console.log("=== ユーザー更新処理開始 ===");
     
-    // 管理者権限チェック
-    console.log("管理者権限チェック開始");
+    // 認証・管理者権限チェック
+    console.log("認証・管理者権限チェック開始");
     try {
       await requireAdmin();
-      console.log("管理者権限チェック成功");
+      console.log("認証・管理者権限チェック成功");
     } catch (error) {
-      console.log("管理者権限チェック失敗:", error);
+      console.log("認証・管理者権限チェック失敗:", error);
       return NextResponse.json(
         { error: "管理者権限が必要です" },
         { status: 403 }
       );
     }
-
-    // 認証チェック
-    console.log("認証チェック開始");
-    const authCheckResult = await checkAuth();
-    if (authCheckResult) {
-      console.log("認証チェック失敗:", authCheckResult);
-      return authCheckResult;
-    }
-    console.log("認証チェック成功");
 
     // リクエストボディの解析
     console.log("リクエストボディの解析開始");
@@ -382,10 +287,6 @@ export async function DELETE(request: Request) {
         { status: 403 }
       );
     }
-    
-    // 認証チェック
-    const authCheckResult = await checkAuth();
-    if (authCheckResult) return authCheckResult;
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("id");

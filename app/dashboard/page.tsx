@@ -1,6 +1,9 @@
-import { DashboardContent } from "./components/dashboard-content";
+import Link from "next/link";
 import { Header } from "@/components/header";
 import { createClient } from "@/lib/supabase/server";
+import { AnnouncementList } from "@/components/announcements/announcement-list";
+import { MemberList } from "@/components/members/member-list";
+import { Sidebar } from "@/components/sidebar";
 
 // データ取得とページ表示を統合
 async function getDashboardData() {
@@ -83,14 +86,50 @@ export default async function DashboardPage() {
   const { announcements, users } = await getDashboardData();
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <DashboardContent
-          announcements={announcements}
-          users={users.data}
-          hasMoreUsers={users.hasMore}
-        />
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <div className="flex-1 flex">
+        <Sidebar />
+
+        {/* Main Content */}
+        <main className="flex-1 p-8">
+          <div className="max-w-7xl mx-auto space-y-8">
+            {/* お知らせセクション */}
+            <section>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">お知らせ</h2>
+                <Link 
+                  href="/announcements" 
+                  className="text-sm text-primary hover:underline"
+                >
+                  すべて見る
+                </Link>
+              </div>
+              <AnnouncementList 
+                announcements={announcements}
+                showLimit={5}
+              />
+            </section>
+
+            {/* メンバー一覧セクション */}
+            <section>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">メンバー一覧</h2>
+                <Link 
+                  href="/members" 
+                  className="text-sm text-primary hover:underline"
+                >
+                  すべて見る
+                </Link>
+              </div>
+              <MemberList 
+                initialUsers={users.data} 
+                hasMore={users.hasMore} 
+              />
+            </section>
+          </div>
+        </main>
       </div>
     </div>
   );

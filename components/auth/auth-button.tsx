@@ -20,9 +20,10 @@ export async function AuthButton() {
       <Button asChild size="sm" variant={"outline"}>
         <Link href="/auth/login">ログイン</Link>
       </Button>
-      <Button asChild size="sm" variant={"default"}>
+      {/* 本番環境では新規登録を無効化 - 管理者による登録のみ許可 */}
+      {/* <Button asChild size="sm" variant={"default"}>
         <Link href="/auth/sign-up">新規登録</Link>
-      </Button>
+      </Button> */}
     </div>
   );
 } 

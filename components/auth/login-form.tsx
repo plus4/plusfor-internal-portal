@@ -38,6 +38,17 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
+
+      // 親ドメインにJWT Cookieを設定
+      try {
+        await fetch('/api/auth/set-parent-cookie', {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch (cookieError) {
+        console.warn('Failed to set parent domain cookie:', cookieError);
+      }
+
       router.push("/dashboard");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");

@@ -7,19 +7,18 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Sidebar } from "@/components/sidebar";
 
 type DashboardContentProps = {
   announcements: (Announcement & { is_read: boolean })[];
   users: User[];
   hasMoreUsers: boolean;
-  isAdmin: boolean;
 };
 
 export function DashboardContent({
   announcements,
   users,
-  hasMoreUsers,
-  isAdmin
+  hasMoreUsers
 }: DashboardContentProps) {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<(Announcement & { is_read: boolean }) | null>(null);
   const [announcementList, setAnnouncementList] = useState(announcements);
@@ -66,60 +65,7 @@ export function DashboardContent({
 
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-background border-r border-border">
-        <div className="p-4">
-          <h1 className="text-xl font-bold mb-8">ダッシュボード</h1>
-          <nav className="space-y-2">
-            <Link 
-              href="/dashboard" 
-              className="block px-4 py-2 rounded-lg hover:bg-accent"
-            >
-              ホーム
-            </Link>
-            <Link 
-              href="/announcements" 
-              className="block px-4 py-2 rounded-lg hover:bg-accent"
-            >
-              お知らせ
-            </Link>
-            <Link 
-              href="/members" 
-              className="block px-4 py-2 rounded-lg hover:bg-accent"
-            >
-              メンバー一覧
-            </Link>
-            <Link 
-              href="/profile" 
-              className="block px-4 py-2 rounded-lg hover:bg-accent"
-            >
-              プロフィール
-            </Link>
-            
-            {/* 管理者のみ表示 */}
-            {isAdmin && (
-              <>
-                <div className="border-t border-border my-4"></div>
-                <div className="px-4 py-2 text-sm font-medium text-muted-foreground">
-                  管理機能
-                </div>
-                <Link 
-                  href="/admin/announcements" 
-                  className="block px-4 py-2 rounded-lg hover:bg-accent text-sm"
-                >
-                  お知らせ管理
-                </Link>
-                <Link 
-                  href="/admin/members" 
-                  className="block px-4 py-2 rounded-lg hover:bg-accent text-sm"
-                >
-                  メンバー管理
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="flex-1 p-8">

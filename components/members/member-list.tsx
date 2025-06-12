@@ -5,12 +5,12 @@ import { User } from '@/lib/types';
 import { Mail } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-type UserListProps = {
+type MemberListProps = {
   initialUsers: User[];
   hasMore: boolean;
 };
 
-export function UserList({ initialUsers, hasMore: initialHasMore }: UserListProps) {
+export function MemberList({ initialUsers, hasMore: initialHasMore }: MemberListProps) {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,7 @@ export function UserList({ initialUsers, hasMore: initialHasMore }: UserListProp
 
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/users?page=${page + 1}`);
+      const response = await fetch(`/api/members?page=${page + 1}`);
       const { data, hasMore: newHasMore } = await response.json();
       setUsers(prev => [...prev, ...data]);
       setHasMore(newHasMore);
@@ -90,7 +90,11 @@ export function UserList({ initialUsers, hasMore: initialHasMore }: UserListProp
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       )}
+      {users.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          メンバーが見つかりません
+        </div>
+      )}
     </div>
   );
-} 
-
+}

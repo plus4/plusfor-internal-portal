@@ -9,6 +9,17 @@ export function LogoutButton() {
 
   const logout = async () => {
     const supabase = createClient();
+    
+    // 親ドメインのCookieを削除
+    try {
+      await fetch('/api/auth/remove-parent-cookie', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (cookieError) {
+      console.warn('Failed to remove parent domain cookie:', cookieError);
+    }
+
     await supabase.auth.signOut();
     router.push("/auth/login");
   };

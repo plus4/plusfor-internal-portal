@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
+import { setParentDomainJWTCookie, shouldSetParentDomainCookie } from "../utils/auth-cookie";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -44,6 +45,22 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // ユーザーがログインしている場合、親ドメインCookieを更新
+  if (user && shouldSetParentDomainCookie()) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        const parentCookieHeader = setParentDomainJWTCookie(
+          session.access_token,
+          session.expires_at
+        );
+        supabaseResponse.headers.append('Set-Cookie', parentCookieHeader);
+      }
+    } catch (error) {
+      console.warn('Failed to set parent domain cookie in middleware:', error);
+    }
+  }
 
   // サインアップページへのアクセスを制限（本番環境では管理者による登録のみ許可）
   // 開発環境ではコメントアウトして利用可能

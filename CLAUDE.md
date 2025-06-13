@@ -17,14 +17,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **UI**: Tailwind CSS + shadcn/ui components with Radix UI primitives
 - **Language**: TypeScript
 - **State Management**: React hooks (built-in state management)
+- **Theme**: Dark/Light mode with next-themes
+- **Date Handling**: date-fns for date formatting and manipulation
 
 ### Project Structure
 This is a Japanese corporate internal portal with user management and announcements functionality:
 
 - `app/` - Next.js App Router pages and API routes
   - `admin/` - Admin-only pages (user management, announcement management)
-  - `dashboard/` - Main dashboard and user-facing pages
-  - `auth/` - Authentication pages (login, signup, password reset)
+  - `dashboard/` - Main dashboard page
+  - `auth/` - Authentication pages (login, signup, password reset, etc.)
   - `api/` - API routes for server-side operations
 - `components/` - Reusable UI components
   - `auth/` - Authentication-related components
@@ -42,17 +44,17 @@ This is a Japanese corporate internal portal with user management and announceme
 - Middleware handles session management and route protection
 
 ### Database Schema
-Current simplified schema (being migrated to full requirements):
-- `announcements` table - Company announcements with publish status
+- Uses Supabase PostgreSQL database
 - `users` table - User profiles linked to auth.users
-- Planned migration to `profiles` table with enhanced user management per REQUIREMENTS.md
+- `announcements` table - Company announcements
+- Row Level Security (RLS) policies for access control
 
 ### Key Features
-- User authentication and profile management
+- User authentication and profile management with Supabase Auth
 - Announcement system with admin controls
-- Role-based access control
+- Role-based access control (ADMIN/USER roles)
 - Responsive design with dark/light theme support
-- Admin dashboard for user and announcement management
+- Professional Japanese corporate UI design
 
 ### File Naming Conventions
 - Components use kebab-case (e.g., `auth-button.tsx`)
@@ -68,4 +70,6 @@ Current simplified schema (being migrated to full requirements):
 - All database interactions use Supabase client with proper SSR handling
 - Components are built with shadcn/ui patterns using Radix UI primitives
 - Authentication state is managed through Supabase's built-in session management
-- The project is in active development - current schema is simplified and will be expanded per REQUIREMENTS.md
+- **File Format**: All files must end with a single newline character for consistency and proper Git handling
+- Follow existing code patterns and conventions when adding new features
+- Use `users` table for all user-related data operations

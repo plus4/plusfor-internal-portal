@@ -23,7 +23,7 @@ Supabaseの認証システムが自動管理するテーブル
 - updated_at: timestamp (Supabase管理)
 ```
 
-### public.profiles テーブル
+### public.users テーブル（現在実装）
 ```sql
 - id: uuid (Primary Key, Foreign Key to auth.users.id)
 - email: string (Not null, Unique)
@@ -57,14 +57,14 @@ Supabaseの認証システムが自動管理するテーブル
 ```sql
 - id: uuid (Primary Key, Default: gen_random_uuid())
 - announcement_id: uuid (Foreign Key to announcements.id, Not null)
-- user_id: uuid (Foreign Key to profiles.id, Not null)
+- user_id: uuid (Foreign Key to users.id, Not null)
 - read_at: timestamp with time zone (Default: now())
 - UNIQUE(announcement_id, user_id)
 ```
 
 ### RLS (Row Level Security) ポリシー
 ```sql
--- profiles テーブル
+-- users テーブル
 - SELECT: 認証済みユーザーは全プロフィール閲覧可能
 - INSERT: 管理者のみ
 - UPDATE: 本人または管理者のみ
@@ -94,7 +94,7 @@ Supabaseの認証システムが自動管理するテーブル
   - リダイレクト処理
 
 - **権限管理**
-  - ADMIN: 全機能へのアクセス（profilesテーブルのroleフィールド）
+  - ADMIN: 全機能へのアクセス（usersテーブルのroleフィールド）
   - USER: 一般ユーザー機能のみ
   - Row Level Security (RLS) による細粒度アクセス制御
 
@@ -113,7 +113,7 @@ Supabaseの認証システムが自動管理するテーブル
 
 - **機能要件**
   - Supabase Auth での認証用アカウント作成
-  - profilesテーブルへの詳細情報登録
+  - usersテーブルへの詳細情報登録
   - バリデーション実装
   - 重複メールアドレスチェック
   - 初期パスワード自動生成オプション
@@ -294,48 +294,16 @@ Supabaseの認証システムが自動管理するテーブル
 
 ## 開発環境設定
 
-### 必要なパッケージ
-```json
-{
-  "dependencies": {
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "@supabase/supabase-js": "^2.45.0",
-    "@supabase/ssr": "^0.5.0",
-    "tailwindcss": "^4.0.0",
-    "@radix-ui/react-alert-dialog": "^1.1.0",
-    "@radix-ui/react-avatar": "^1.1.0",
-    "@radix-ui/react-button": "^0.1.0",
-    "@radix-ui/react-dropdown-menu": "^2.1.0",
-    "@radix-ui/react-form": "^0.1.0",
-    "@radix-ui/react-label": "^2.1.0",
-    "@radix-ui/react-select": "^2.1.0",
-    "@radix-ui/react-tabs": "^1.1.0",
-    "@radix-ui/react-toast": "^1.2.0",
-    "lucide-react": "^0.400.0",
-    "react-hook-form": "^7.52.0",
-    "zod": "^3.23.0",
-    "@hookform/resolvers": "^3.9.0",
-    "date-fns": "^3.6.0",
-    "zustand": "^4.5.0",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.4.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "typescript": "^5.5.0",
-    "eslint": "^9.0.0",
-    "eslint-config-next": "^15.0.0",
-    "prettier": "^3.3.0",
-    "@tailwindcss/typography": "^0.5.0",
-    "supabase": "^1.192.0"
-  }
-}
-```
+### 主要なパッケージ
+- **Next.js**: React フレームワーク
+- **Supabase**: データベース・認証
+- **Tailwind CSS**: スタイリング
+- **Radix UI**: UIコンポーネント
+- **TypeScript**: 型安全性
+- **Lucide React**: アイコン
+- **date-fns**: 日付操作
+
+詳細なパッケージバージョンはpackage.jsonを参照してください。
 
 ### 環境変数
 ```env
@@ -352,11 +320,11 @@ CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
 CREATE TYPE user_type_enum AS ENUM ('EMPLOYEE', 'BP');
 CREATE TYPE target_audience AS ENUM ('EMPLOYEE', 'BP', 'ALL');
 
--- トリガー関数（プロフィール自動作成用）
+-- トリガー関数（ユーザープロフィール自動作成用）
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $
 BEGIN
-  INSERT INTO public.profiles (id, email, name, role, user_type)
+  INSERT INTO public.users (id, email, name, role, user_type)
   VALUES (NEW.id, NEW.email, COALESCE(NEW.raw_user_meta_data->>'name', ''), 'USER', 'EMPLOYEE');
   RETURN NEW;
 END;
@@ -368,30 +336,13 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 ```
 
-## 実装優先順位
+## 実装ガイドライン
 
-### Phase 1: 基盤機能
-1. Next.js 15 + Supabaseプロジェクト初期設定
-2. Supabaseデータベース設計・RLSポリシー設定
-3. Supabase Auth認証システム実装
-4. 基本レイアウト・ナビゲーション（shadcn/ui + Tailwind CSS v4）
-
-### Phase 2: ユーザー管理
-1. Supabase Auth + profilesテーブル連携
-2. ユーザー登録・編集・削除（管理者機能）
-3. プロフィール管理（一般ユーザー）
-4. 社員一覧表示
-
-### Phase 3: お知らせ機能
-1. お知らせ作成・編集・削除（RLS適用）
-2. ユーザータイプ別お知らせ表示
-3. 既読管理機能（リアルタイム更新対応）
-
-### Phase 4: 最適化・デプロイ
-1. パフォーマンス最適化（Next.js 15の新機能活用）
-2. Vercelデプロイ設定
-3. Supabase本番環境設定
-4. セキュリティ監査
+### 開発の優先順位
+1. **セキュリティ**: すべての機能は適切なRLSポリシーと認証チェックを実装する
+2. **ユーザビリティ**: 直感的で使いやすいインターフェースを心がける
+3. **パフォーマンス**: 効率的なデータ取得とレンダリングを行う
+4. **保守性**: 可読性の高いコードとドキュメント化を重視する
 
 ## 注意事項
 

@@ -23,7 +23,7 @@ Supabaseの認証システムが自動管理するテーブル
 - updated_at: timestamp (Supabase管理)
 ```
 
-### public.profiles テーブル
+### public.users テーブル（現在実装）
 ```sql
 - id: uuid (Primary Key, Foreign Key to auth.users.id)
 - email: string (Not null, Unique)
@@ -57,14 +57,14 @@ Supabaseの認証システムが自動管理するテーブル
 ```sql
 - id: uuid (Primary Key, Default: gen_random_uuid())
 - announcement_id: uuid (Foreign Key to announcements.id, Not null)
-- user_id: uuid (Foreign Key to profiles.id, Not null)
+- user_id: uuid (Foreign Key to users.id, Not null)
 - read_at: timestamp with time zone (Default: now())
 - UNIQUE(announcement_id, user_id)
 ```
 
 ### RLS (Row Level Security) ポリシー
 ```sql
--- profiles テーブル
+-- users テーブル
 - SELECT: 認証済みユーザーは全プロフィール閲覧可能
 - INSERT: 管理者のみ
 - UPDATE: 本人または管理者のみ
@@ -94,7 +94,7 @@ Supabaseの認証システムが自動管理するテーブル
   - リダイレクト処理
 
 - **権限管理**
-  - ADMIN: 全機能へのアクセス（profilesテーブルのroleフィールド）
+  - ADMIN: 全機能へのアクセス（usersテーブルのroleフィールド）
   - USER: 一般ユーザー機能のみ
   - Row Level Security (RLS) による細粒度アクセス制御
 
@@ -113,7 +113,7 @@ Supabaseの認証システムが自動管理するテーブル
 
 - **機能要件**
   - Supabase Auth での認証用アカウント作成
-  - profilesテーブルへの詳細情報登録
+  - usersテーブルへの詳細情報登録
   - バリデーション実装
   - 重複メールアドレスチェック
   - 初期パスワード自動生成オプション
@@ -352,11 +352,11 @@ CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
 CREATE TYPE user_type_enum AS ENUM ('EMPLOYEE', 'BP');
 CREATE TYPE target_audience AS ENUM ('EMPLOYEE', 'BP', 'ALL');
 
--- トリガー関数（プロフィール自動作成用）
+-- トリガー関数（ユーザープロフィール自動作成用）
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $
 BEGIN
-  INSERT INTO public.profiles (id, email, name, role, user_type)
+  INSERT INTO public.users (id, email, name, role, user_type)
   VALUES (NEW.id, NEW.email, COALESCE(NEW.raw_user_meta_data->>'name', ''), 'USER', 'EMPLOYEE');
   RETURN NEW;
 END;
@@ -368,30 +368,74 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 ```
 
-## 実装優先順位
+## 現在の実装状況（2025年6月）
 
-### Phase 1: 基盤機能
-1. Next.js 15 + Supabaseプロジェクト初期設定
-2. Supabaseデータベース設計・RLSポリシー設定
-3. Supabase Auth認証システム実装
-4. 基本レイアウト・ナビゲーション（shadcn/ui + Tailwind CSS v4）
+### ✅ 完了済み機能
+- **基盤システム**
+  - Next.js 15 + App Router プロジェクト構築
+  - Supabase 認証・データベース設定
+  - TypeScript 設定
+  - Tailwind CSS + shadcn/ui コンポーネント導入
+  - ESLint 設定
 
-### Phase 2: ユーザー管理
-1. Supabase Auth + profilesテーブル連携
-2. ユーザー登録・編集・削除（管理者機能）
-3. プロフィール管理（一般ユーザー）
-4. 社員一覧表示
+- **認証システム**
+  - ログイン・ログアウト機能
+  - ユーザー登録機能
+  - パスワードリセット機能
+  - セッション管理・ミドルウェア
 
-### Phase 3: お知らせ機能
-1. お知らせ作成・編集・削除（RLS適用）
-2. ユーザータイプ別お知らせ表示
-3. 既読管理機能（リアルタイム更新対応）
+- **レイアウト・ナビゲーション**
+  - レスポンシブヘッダーコンポーネント
+  - サイドバーナビゲーション（admin/user共通）
+  - ダークモード・ライトモード切り替え
+  - ユーザー認証状態に基づく条件表示
+
+- **ユーザー管理（基本機能）**
+  - ユーザープロフィール表示・編集
+  - メンバー一覧表示（検索・フィルタリング）
+  - 管理者用メンバー管理画面
+
+- **お知らせ機能（基本機能）**
+  - お知らせ一覧表示
+  - お知らせ詳細表示
+  - 管理者用お知らせ管理画面
+  - お知らせ既読機能
+
+- **データレイヤー**
+  - Supabase クライアント設定（Client/Server/Admin/Middleware）
+  - データ取得ロジックの集約（lib/data/）
+  - TypeScript 型定義
+
+### 🚧 進行中の機能
+- **コンポーネント最適化**
+  - 共通コンポーネントの抽象化
+  - パフォーマンス最適化
+
+### 📋 今後の実装予定
+
+### Phase 1: 管理機能の強化
+1. ユーザー新規作成・編集・削除機能
+2. お知らせ作成・編集・削除機能
+3. 既読状況管理・統計表示
+4. バリデーション強化
+
+### Phase 2: UI/UX改善
+1. ローディング状態の改善
+2. エラーハンドリングの強化
+3. レスポンシブデザインの最適化
+4. アクセシビリティ対応
+
+### Phase 3: 高度な機能
+1. ファイルアップロード機能
+2. 通知システム
+3. 検索機能の強化
+4. CSVエクスポート機能
 
 ### Phase 4: 最適化・デプロイ
-1. パフォーマンス最適化（Next.js 15の新機能活用）
-2. Vercelデプロイ設定
-3. Supabase本番環境設定
-4. セキュリティ監査
+1. パフォーマンス最適化
+2. セキュリティ監査
+3. テストコード作成
+4. 本番環境デプロイ
 
 ## 注意事項
 

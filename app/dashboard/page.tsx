@@ -7,8 +7,8 @@ import { getAnnouncementsWithReadStatus } from "@/lib/data/announcements";
 import { getMembersData } from "@/lib/data/members";
 
 async function getDashboardData() {
-  // Get announcements (limited to 5 for dashboard)
-  const announcements = await getAnnouncementsWithReadStatus(undefined, 5);
+  // Get announcements (limited to 3 for dashboard)
+  const announcements = await getAnnouncementsWithReadStatus(undefined, 3);
   
   // Get members (limited to 6 for dashboard)
   const membersData = await getMembersData(0, 6);
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
               </div>
               <AnnouncementList 
                 announcements={announcements}
-                showLimit={5}
+                showLimit={3}
               />
             </section>
 

@@ -13,5 +13,5 @@ export function LogoutButton() {
     router.push("/auth/login");
   };
 
-  return <Button onClick={logout}>ログアウト</Button>;
+  return <Button onClick={logout} variant="ghost" className="w-full justify-start h-auto px-3 py-2 text-sm">ログアウト</Button>;
 } 

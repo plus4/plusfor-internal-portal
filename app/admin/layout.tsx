@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { createClient } from '@/lib/supabase/server';
+import { LayoutProvider } from "@/lib/layout-context";
 
 // データ取得とロジックを統合
 async function checkAdminAccess(): Promise<boolean> {
@@ -45,15 +46,17 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <div className="flex flex-1">
-          <Sidebar />
-          <main className="flex-1">{children}</main>
+    <LayoutProvider>
+      <div className="flex h-screen">
+        <div className="flex-1 flex flex-col">
+          <Header />
+          <div className="flex flex-1">
+            <Sidebar />
+            <main className="flex-1">{children}</main>
+          </div>
         </div>
       </div>
-    </div>
+    </LayoutProvider>
   );
 }
 

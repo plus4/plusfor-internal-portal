@@ -2,20 +2,22 @@ import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { AnnouncementList } from "@/components/announcements/announcement-list";
 import { getAnnouncementsWithReadStatus } from "@/lib/data/announcements";
+import { LayoutProvider } from "@/lib/layout-context";
 
 
 export default async function AnnouncementsPage() {
   const announcements = await getAnnouncementsWithReadStatus();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <LayoutProvider>
+      <div className="min-h-screen flex flex-col">
+        <Header />
       
       <div className="flex-1 flex">
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 lg:p-8 w-full lg:w-auto">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-8">お知らせ</h1>
             <AnnouncementList announcements={announcements} />
@@ -23,5 +25,6 @@ export default async function AnnouncementsPage() {
         </main>
       </div>
     </div>
+    </LayoutProvider>
   );
 }

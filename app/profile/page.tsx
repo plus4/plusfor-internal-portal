@@ -1,6 +1,7 @@
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { createClient } from "@/lib/supabase/server";
+import { LayoutProvider } from "@/lib/layout-context";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,12 +58,14 @@ export default async function ProfilePage() {
   };
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 flex flex-col">
+    <LayoutProvider>
+      <div className="min-h-screen flex flex-col">
         <Header />
-        <div className="flex flex-1">
-          <Sidebar />
-          <main className="flex-1 p-8 overflow-y-auto">
+      
+      <div className="flex-1 flex">
+        <Sidebar />
+        
+        <main className="flex-1 p-4 lg:p-8 w-full lg:w-auto overflow-y-auto">
             <div className="max-w-4xl mx-auto space-y-8">
               <div>
                 <h1 className="text-3xl font-bold mb-2">プロフィール</h1>
@@ -156,9 +159,9 @@ export default async function ProfilePage() {
                 </Card>
               </div>
             </div>
-          </main>
-        </div>
+        </main>
       </div>
     </div>
+    </LayoutProvider>
   );
 }

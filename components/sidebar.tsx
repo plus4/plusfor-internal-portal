@@ -59,11 +59,11 @@ export function Sidebar() {
       
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-50 h-full w-64 bg-background border-r border-border transform transition-transform duration-300 ease-in-out
-        lg:relative lg:translate-x-0 lg:z-auto
+        fixed top-0 left-0 z-50 h-screen w-64 bg-background border-r border-border transform transition-transform duration-300 ease-in-out
+        lg:relative lg:translate-x-0 lg:z-auto lg:h-auto lg:flex lg:flex-col
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="p-4">
+        <div className="p-4 lg:flex-1">
           {/* Mobile close button */}
           <div className="flex justify-end lg:hidden mb-4">
             <Button

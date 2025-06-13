@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,8 +68,9 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
+                      <AvatarImage src={userInfo?.profile_image_url} alt={userInfo?.name || user.email} />
                       <AvatarFallback>
-                        <User className="h-4 w-4" />
+                        {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -77,10 +78,17 @@ export function Header() {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuItem className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{userInfo?.name || user.email}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium leading-none">{userInfo?.name || user.email}</p>
+                        {userInfo?.role === 'ADMIN' && (
+                          <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded-full">
+                            管理者
+                          </span>
+                        )}
+                      </div>
                       {userInfo && (
                         <p className="text-xs text-muted-foreground">
-                          {userInfo.department} / {userInfo.position}
+                          {userInfo.department} {userInfo.position && `/ ${userInfo.position}`}
                         </p>
                       )}
                     </div>

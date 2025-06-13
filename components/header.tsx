@@ -91,7 +91,7 @@ export function Header() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent className="min-w-48 w-auto" align="end" forceMount>
                   <DropdownMenuItem className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <div className="flex items-center gap-2">
@@ -109,8 +109,10 @@ export function Header() {
                       )}
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <LogoutButton />
+                  <DropdownMenuItem className="p-0">
+                    <div className="w-full">
+                      <LogoutButton />
+                    </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

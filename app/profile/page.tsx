@@ -8,6 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User, Mail, Building, Briefcase, Calendar, Shield } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "プロフィール"
+};
 
 async function getUserProfile() {
   const supabase = await createClient();

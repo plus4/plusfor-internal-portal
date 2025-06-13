@@ -208,7 +208,7 @@ export default function AnnouncementsPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingAnnouncement ? "お知らせを編集" : "新規お知らせを作成"}
+                {editingAnnouncement ? "お知らせを編集" : "新規お知らせ作成"}
               </DialogTitle>
               <DialogDescription>
                 お知らせのタイトルと内容を入力してください。

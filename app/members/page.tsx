@@ -3,6 +3,11 @@ import { Sidebar } from "@/components/sidebar";
 import { MemberList } from "@/components/members/member-list";
 import { getMembersData } from "@/lib/data/members";
 import { LayoutProvider } from "@/lib/layout-context";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "メンバー一覧"
+};
 
 
 export default async function MembersPage() {

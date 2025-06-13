@@ -3,6 +3,11 @@ import { Sidebar } from "@/components/sidebar";
 import { AnnouncementList } from "@/components/announcements/announcement-list";
 import { getAnnouncementsWithReadStatus } from "@/lib/data/announcements";
 import { LayoutProvider } from "@/lib/layout-context";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "お知らせ"
+};
 
 
 export default async function AnnouncementsPage() {

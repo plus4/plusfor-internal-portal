@@ -1,59 +1,94 @@
-# 準備
-## プロジェクトのテンプレート
-- https://github.com/vercel/next.js/blob/canary/examples/with-supabase
+# 社内ポータル (Internal Portal)
 
-### 元々のREADME
-- https://github.com/vercel/next.js/blob/canary/examples/with-supabase/README.md
+社内向けポータルサイトの Next.js アプリケーションです。
 
-## 認証・DBアクセスできるようになるまで		
-- Supabaseの認証設定へ認証後のリダイレクトURLを指定
-  - https://supabase.com/dashboard/project/myxtnmomsegbqdvbpqgk?method=github
-- Supabaseでのテーブル作成・データ投入	
-- Next.jsの環境変数へSupabaseとの接続設定を記載（ローカル環境用、商用環境は自動設定）	
-- Next.jsのコードでSupabaseクライアントライブラリを利用してDBアクセス	
+## 🚀 開発環境構築
 
-## 各環境の作成（ローカル開発環境の準備）		
-### 商用環境	
-- Vercelからテンプレートを指定してDeployするだけ
-- ドメイン・環境変数は自動割り当て
+プロジェクトの環境構築には、以下のパターンがあります：
 
-### ローカル環境	
-- 商用環境作成時にGitHubリポジトリが作成される
-- GitHubリポジトリをClone後に以下を実行
-- npm install
-- npm run dev
-- Supabaseは商用と共有
+### 📖 環境構築ガイド
 
+- **[ローカル Next.js + 本番 Supabase 環境](./docs/setup-local-nextjs-prod-supabase.md)** - 本番 Supabase に接続してローカル開発を行う場合
+- ローカル Next.js + ローカル Supabase 環境 with Docker - _(準備中)_
+- ローカル Next.js + ローカル Supabase 環境 with DevContainer - _(準備中)_
+- 個人用 Supabase + Vercel 環境 - _(準備中)_
 
-# 概要
-## 1. 主要なディレクトリ：
-- `app/`: Next.js 13以降のApp Routerを使用したページコンポーネントやルーティングが格納されています
-- `components/`: 再利用可能なUIコンポーネントが格納されています
-- `hooks/`: カスタムReactフックが格納されています
+## 📋 クイックスタート
+
+```bash
+# リポジトリのクローン
+git clone [リポジトリURL]
+cd plusfor-internal-portal-sub
+
+# 依存関係のインストール
+npm install
+
+# 環境変数の設定（詳細は開発環境構築ガイドを参照）
+cp .env.example .env.local
+# .env.localを編集して必要な値を設定
+
+# 開発サーバーの起動
+npm run dev
+```
+
+## 📚 ドキュメント
+
+### 環境構築
+
+- [ローカル Next.js + 本番 Supabase](./docs/setup-local-nextjs-prod-supabase.md) - 本番環境の Supabase を使用したローカル開発
+- ローカル Next.js + ローカル Supabase with Docker - _(準備中)_
+- ローカル Next.js + ローカル Supabase with DevContainer - _(準備中)_
+- 個人用 Supabase + Vercel - _(準備中)_
+
+### その他のドキュメント
+
+- [REQUIREMENTS.md](./REQUIREMENTS.md) - システム要件定義書
+- [CLAUDE.md](./CLAUDE.md) - Claude Code 用の開発ガイドライン
+
+## 🛠️ 技術スタック
+
+- **Framework**: Next.js 15+ (App Router)
+- **Database/Auth**: Supabase (PostgreSQL + 認証)
+- **UI**: Tailwind CSS + shadcn/ui
+- **言語**: TypeScript
+- **ホスティング**: Vercel
+
+## 📁 プロジェクト構成
+
+### 主要なディレクトリ
+
+- `app/`: Next.js 13 以降の App Router を使用したページコンポーネントやルーティングが格納されています
+- `components/`: 再利用可能な UI コンポーネントが格納されています
+- `hooks/`: カスタム React フックが格納されています
 - `lib/`: ユーティリティ関数や共通のロジックが格納されています
 
-## 2. 設定ファイル：
-- `package.json`: プロジェクトの依存関係やスクリプトが定義されています
-- `tsconfig.json`: TypeScriptの設定ファイル
-- `next.config.ts`: Next.jsの設定ファイル
-- `tailwind.config.ts`: Tailwind CSSの設定ファイル
-- `postcss.config.mjs`: PostCSSの設定ファイル
-- `eslint.config.mjs`: ESLintの設定ファイル
+### 設定ファイル
 
-## 3. その他の重要なファイル：
-- `middleware.ts`: Next.jsのミドルウェア（認証など）の設定
+- `package.json`: プロジェクトの依存関係やスクリプトが定義されています
+- `tsconfig.json`: TypeScript の設定ファイル
+- `next.config.ts`: Next.js の設定ファイル
+- `tailwind.config.ts`: Tailwind CSS の設定ファイル
+- `postcss.config.mjs`: PostCSS の設定ファイル
+- `eslint.config.mjs`: ESLint の設定ファイル
+
+### その他の重要なファイル
+
+- `middleware.ts`: Next.js のミドルウェア（認証など）の設定
 - `components.json`: コンポーネントの設定ファイル
 
-## ディレクトリ詳細
-### 1. `app/` ディレクトリの構造：
+### ディレクトリ詳細
+
+#### `app/` ディレクトリの構造
+
 - `auth/`: 認証関連のページ
 - `protected/`: 認証が必要な保護されたページ
 - `layout.tsx`: アプリケーションの共通レイアウト
 - `page.tsx`: トップページ
 - `globals.css`: グローバルスタイル
 
-### 2. `components/` ディレクトリの構造：
-- `ui/`: 基本的なUIコンポーネント
+#### `components/` ディレクトリの構造
+
+- `ui/`: 基本的な UI コンポーネント
 - 認証関連コンポーネント：
 - `auth-button.tsx`
 - `login-form.tsx`
@@ -66,21 +101,26 @@
 - `hero.tsx`
 - `deploy-button.tsx`
 
-## 特徴
-### 1. **認証機能**: 
-- Supabaseを使用した認証システムが実装されており、ログイン、サインアップ、パスワードリセットなどの機能があります。
+## 🌟 特徴
 
-### 2. **モダンな技術スタック**:
-- Next.js 13以降のApp Router
+### 認証機能
+
+- Supabase を使用した認証システムが実装されており、ログイン、サインアップ、パスワードリセットなどの機能があります。
+
+### モダンな技術スタック
+
+- Next.js 13 以降の App Router
 - TypeScript
 - Tailwind CSS
 - Supabase
 
-### 3. **UI/UX**:
+### UI/UX
+
 - ダークモード/ライトモードの切り替え機能
 - レスポンシブデザイン
-- モダンなUIコンポーネント
+- モダンな UI コンポーネント
 
-### 4. **セキュリティ**:
+### セキュリティ
+
 - ミドルウェアによる保護されたルート
 - 環境変数の適切な管理

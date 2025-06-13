@@ -91,9 +91,9 @@ export function Header() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="min-w-48 w-auto" align="end" forceMount>
-                  <DropdownMenuItem className="font-normal">
-                    <div className="flex flex-col space-y-1">
+                <DropdownMenuContent className="w-auto max-w-xs" align="end" forceMount>
+                  <DropdownMenuItem className="font-normal px-3 py-2">
+                    <div className="flex flex-col space-y-1 w-full">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium leading-none">{userInfo?.name || user.email}</p>
                         {userInfo?.role === 'ADMIN' && (
@@ -110,9 +110,7 @@ export function Header() {
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="p-0">
-                    <div className="w-full">
-                      <LogoutButton />
-                    </div>
+                    <LogoutButton />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -294,48 +294,16 @@ Supabaseの認証システムが自動管理するテーブル
 
 ## 開発環境設定
 
-### 必要なパッケージ
-```json
-{
-  "dependencies": {
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "@supabase/supabase-js": "^2.45.0",
-    "@supabase/ssr": "^0.5.0",
-    "tailwindcss": "^4.0.0",
-    "@radix-ui/react-alert-dialog": "^1.1.0",
-    "@radix-ui/react-avatar": "^1.1.0",
-    "@radix-ui/react-button": "^0.1.0",
-    "@radix-ui/react-dropdown-menu": "^2.1.0",
-    "@radix-ui/react-form": "^0.1.0",
-    "@radix-ui/react-label": "^2.1.0",
-    "@radix-ui/react-select": "^2.1.0",
-    "@radix-ui/react-tabs": "^1.1.0",
-    "@radix-ui/react-toast": "^1.2.0",
-    "lucide-react": "^0.400.0",
-    "react-hook-form": "^7.52.0",
-    "zod": "^3.23.0",
-    "@hookform/resolvers": "^3.9.0",
-    "date-fns": "^3.6.0",
-    "zustand": "^4.5.0",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.4.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "typescript": "^5.5.0",
-    "eslint": "^9.0.0",
-    "eslint-config-next": "^15.0.0",
-    "prettier": "^3.3.0",
-    "@tailwindcss/typography": "^0.5.0",
-    "supabase": "^1.192.0"
-  }
-}
-```
+### 主要なパッケージ
+- **Next.js**: React フレームワーク
+- **Supabase**: データベース・認証
+- **Tailwind CSS**: スタイリング
+- **Radix UI**: UIコンポーネント
+- **TypeScript**: 型安全性
+- **Lucide React**: アイコン
+- **date-fns**: 日付操作
+
+詳細なパッケージバージョンはpackage.jsonを参照してください。
 
 ### 環境変数
 ```env
@@ -368,74 +336,13 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 ```
 
-## 現在の実装状況（2025年6月）
+## 実装ガイドライン
 
-### ✅ 完了済み機能
-- **基盤システム**
-  - Next.js 15 + App Router プロジェクト構築
-  - Supabase 認証・データベース設定
-  - TypeScript 設定
-  - Tailwind CSS + shadcn/ui コンポーネント導入
-  - ESLint 設定
-
-- **認証システム**
-  - ログイン・ログアウト機能
-  - ユーザー登録機能
-  - パスワードリセット機能
-  - セッション管理・ミドルウェア
-
-- **レイアウト・ナビゲーション**
-  - レスポンシブヘッダーコンポーネント
-  - サイドバーナビゲーション（admin/user共通）
-  - ダークモード・ライトモード切り替え
-  - ユーザー認証状態に基づく条件表示
-
-- **ユーザー管理（基本機能）**
-  - ユーザープロフィール表示・編集
-  - メンバー一覧表示（検索・フィルタリング）
-  - 管理者用メンバー管理画面
-
-- **お知らせ機能（基本機能）**
-  - お知らせ一覧表示
-  - お知らせ詳細表示
-  - 管理者用お知らせ管理画面
-  - お知らせ既読機能
-
-- **データレイヤー**
-  - Supabase クライアント設定（Client/Server/Admin/Middleware）
-  - データ取得ロジックの集約（lib/data/）
-  - TypeScript 型定義
-
-### 🚧 進行中の機能
-- **コンポーネント最適化**
-  - 共通コンポーネントの抽象化
-  - パフォーマンス最適化
-
-### 📋 今後の実装予定
-
-### Phase 1: 管理機能の強化
-1. ユーザー新規作成・編集・削除機能
-2. お知らせ作成・編集・削除機能
-3. 既読状況管理・統計表示
-4. バリデーション強化
-
-### Phase 2: UI/UX改善
-1. ローディング状態の改善
-2. エラーハンドリングの強化
-3. レスポンシブデザインの最適化
-4. アクセシビリティ対応
-
-### Phase 3: 高度な機能
-1. ファイルアップロード機能
-2. 通知システム
-3. 検索機能の強化
-4. CSVエクスポート機能
-
-### Phase 4: 最適化・デプロイ
-1. パフォーマンス最適化
-2. セキュリティ監査
-3. テストコード作成
-4. 本番環境デプロイ
+### 開発の優先順位
+1. **セキュリティ**: すべての機能は適切なRLSポリシーと認証チェックを実装する
+2. **ユーザビリティ**: 直感的で使いやすいインターフェースを心がける
+3. **パフォーマンス**: 効率的なデータ取得とレンダリングを行う
+4. **保守性**: 可読性の高いコードとドキュメント化を重視する
 
 ## 注意事項
 

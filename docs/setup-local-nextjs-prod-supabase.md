@@ -47,16 +47,16 @@ SUPABASE_SERVICE_ROLE_KEY=[サービスロールキー]
 
 1. **Project URL**の取得
 
-   - [Project Settings > Configuration > General](https://supabase.com/dashboard/project/myxtnmomsegbqdvbpqgk/settings/general)
+   - [Project Settings > Data API > API Settings > Project URL](https://supabase.com/dashboard/project/[プロジェクトID]/settings/api)
    - 「Project URL」の値をコピー
 
 2. **Anon Key（匿名キー）**の取得
 
-   - [Project Settings > API](https://supabase.com/dashboard/project/myxtnmomsegbqdvbpqgk/settings/api)
-   - 「Project API keys」セクションの「anon public」の値をコピー
+   - [Project Settings > API Keys > API Keys](https://supabase.com/dashboard/project/[プロジェクトID]/settings/api-keys)
+   - 「API keys」セクションの「anon public」の値をコピー
 
 3. **Service Role Key（サービスロールキー）**の取得
-   - 同じく「Project API keys」セクションの「service_role secret」
+   - 同じく「API keys」セクションの「service_role secret」
    - 「Reveal」ボタンをクリックして表示される値をコピー
 
 ⚠️ **重要**: サービスロールキーは秘密情報です。絶対に公開リポジトリにコミットしないでください。

@@ -218,14 +218,14 @@ export default function UsersPage() {
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">ユーザー管理</h1>
+        <h1 className="text-2xl font-bold">メンバー管理</h1>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button>新規ユーザー作成</Button>
+            <Button>新規作成</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>新規ユーザー作成</DialogTitle>
+              <DialogTitle>新規メンバー作成</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -398,7 +398,7 @@ export default function UsersPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>ユーザー情報の編集</DialogTitle>
+            <DialogTitle>メンバー情報の編集</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>

@@ -6,6 +6,11 @@ import { Sidebar } from "@/components/sidebar";
 import { getAnnouncementsWithReadStatus } from "@/lib/data/announcements";
 import { getMembersData } from "@/lib/data/members";
 import { LayoutProvider } from "@/lib/layout-context";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ダッシュボード"
+};
 
 async function getDashboardData() {
   // Get announcements (limited to 3 for dashboard)

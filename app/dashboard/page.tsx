@@ -5,6 +5,7 @@ import { MemberList } from "@/components/members/member-list";
 import { Sidebar } from "@/components/sidebar";
 import { getAnnouncementsWithReadStatus } from "@/lib/data/announcements";
 import { getMembersData } from "@/lib/data/members";
+import { LayoutProvider } from "@/lib/layout-context";
 
 async function getDashboardData() {
   // Get announcements (limited to 3 for dashboard)
@@ -26,14 +27,15 @@ export default async function DashboardPage() {
   const { announcements, users } = await getDashboardData();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <LayoutProvider>
+      <div className="min-h-screen flex flex-col">
+        <Header />
       
       <div className="flex-1 flex">
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 lg:p-8 w-full lg:w-auto">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* お知らせセクション */}
             <section>
@@ -72,6 +74,7 @@ export default async function DashboardPage() {
         </main>
       </div>
     </div>
+    </LayoutProvider>
   );
 } 
 

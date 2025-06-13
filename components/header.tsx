@@ -11,22 +11,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User } from 'lucide-react';
+import { User, Menu } from 'lucide-react';
 import { LogoutButton } from "@/components/auth/logout-button";
 import { useEffect, useState } from "react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
+import { useLayout } from "@/lib/layout-context";
 
-type User = {
+type UserProfile = {
   name: string;
   department: string;
   position: string;
+  role: 'ADMIN' | 'USER';
+  profile_image_url?: string;
 };
 
 export function Header() {
   const router = useRouter();
   const supabase = createClient();
+  const { toggleSidebar } = useLayout();
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     const getUser = async () => {
@@ -42,7 +46,9 @@ export function Header() {
             setUserInfo({
               name: userData.name,
               department: userData.department,
-              position: userData.position
+              position: userData.position,
+              role: userData.role,
+              profile_image_url: userData.profile_image_url
             });
           }
         } catch (error) {
@@ -56,7 +62,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center px-6">
-        <div className="mr-4 flex">
+        <div className="mr-4 flex items-center">
+          {/* Mobile hamburger button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="mr-2 lg:hidden"
+            onClick={toggleSidebar}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          
           <Link className="mr-6 flex items-center space-x-2" href="/dashboard">
             <span className="font-bold">社内ポータル</span>
           </Link>
